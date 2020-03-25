@@ -1,4 +1,6 @@
+
 window.addEventListener('load', (event) => {
+  $('#introNotification').addClass('d-none')
 showTable()
 $( function() {
     $( "#appendZoomData" ).sortable({
@@ -20,10 +22,18 @@ $( function() {
   $('.navbar-nav>li>a').on('click', function(){
       $('.navbar-collapse').collapse('hide');
   });
-
+  $('#reset').on('click', function(){
+    chrome.storage.sync.set({zoomData: '[{"class":"ESET 210","meetingID":"123456789","info":"This is an example"}, {"class":"CSCE 222","meetingID":"123456789","info":"HELL MW 2:30 PM"}, {"class":"PHYS 207","meetingID":"123456789","info":"TA SESSION 3:00 PM"}]'}, function() {
+      console.log("Installation Set.");
+      showTable();
+    });
+  });
   $(' #delOption' ).click(function() {
-    console.log("clicked delete")
   $("#delInputGroup").toggleClass("d-none");
+});
+
+$(' #introInfo' ).click(function() {
+$("#introNotification").toggleClass("d-none");
 });
 
 });
@@ -128,7 +138,7 @@ chrome.storage.sync.get('zoomData', function(data) {
       showTable()
     });
 
-  
+
 });
 
 

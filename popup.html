@@ -22,7 +22,9 @@
 	<body>
 
 		<nav class="navbar navbar-expand-lg navbar-light bg-light">
-		  <a class="navbar-brand" href="#">Zoom Utils</a>
+		  <a class="navbar-brand" href="#">Zoom Utils
+          <img id="introInfo" class="" src="img/info-24px.svg" alt="Info" style="vertical-align: sub;">
+			</a>
 		  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 		    <span class="navbar-toggler-icon"></span>
 		  </button>
@@ -35,6 +37,9 @@
 		      <li class="nav-item">
 		        <a id="delOption" class="nav-link" href="#">Delete</a>
 		      </li>
+					<li class="nav-item">
+		        <a id="reset" class="nav-link" href="#">I messed something up. Reset</a>
+		      </li>
 		      <li class="nav-item">
 		        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Future Features</a>
 		      </li>
@@ -43,6 +48,27 @@
 		</nav>
 
 		<section>
+			<div id="introNotification" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="toast-header">
+    <strong class="mr-auto">Howdy!</strong>
+    <small class="text-muted">Let's get started</small>
+  </div>
+  <div class="toast-body">
+		The app is loaded with default meetings. To get rid of them, simply click the menu on the top right to delete all the meetings by selecting the menu, selecting delete, and then typing: 123456789 and then clicking delete.
+<br>
+		You can then again, click the menu, select add and then fill out the appropriate inputs.
+<br>
+		After your meetings are added, you may drag and drop the entries in which ever way you would like them to appear!
+		<br>
+		Lastly, Click on the Meeting ID to launch the ZOOM app!
+		<br><br>
+		Made with love(and javascript), by Jonathan Samuel
+		<br>
+		Thanks, and gig 'em.
+  </div>
+
+</div>
+
 			<table class="table table-hover">
 				<thead>
 					<tr>
