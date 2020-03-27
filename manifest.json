@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Zoom Utils",
-	"description": "Tamu Zoom Utils",
+	"description": "Zoom Utils",
 	"version": "1.1",
 	"permissions": [
 		"storage"

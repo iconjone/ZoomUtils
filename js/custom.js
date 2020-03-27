@@ -1,5 +1,6 @@
   var deleteMode = false;
   var addMode = false;
+  var infoMode = false;
 window.addEventListener('load', (event) => {
   $('#introNotification').addClass('d-none')
 showTable()
@@ -22,7 +23,7 @@ $( function() {
   //  $('#addIcon').toggleClass('d-none')
     $('#addIcon').toggleClass('wiggle')
     $("#addInputGroup").toggleClass("d-none");
-    if(!addMode && !deleteMode)
+if(!deleteMode && !addMode && !infoMode)
     location.reload()
   });
   $( "#addIcon" ).click(function() {
@@ -30,7 +31,7 @@ $( function() {
     //$('#addIcon').toggleClass('d-none')
     $('#addIcon').toggleClass('wiggle')
     $("#addInputGroup").toggleClass("d-none");
-    if(!addMode && !deleteMode)
+if(!deleteMode && !addMode && !infoMode)
     location.reload()
   });
 
@@ -52,7 +53,7 @@ $( "#delOption" ).click(function() {
 //  $('#delIcon').toggleClass('d-none')
   $('#delIcon').toggleClass('wiggle')
   $("#delInputGroup").toggleClass("d-none");
-  if(!deleteMode && !addMode)
+if(!deleteMode && !addMode && !infoMode)
   location.reload()
 });
 $( "#delIcon" ).click(function() {
@@ -63,15 +64,18 @@ $( "#delIcon" ).click(function() {
 //  $('#delIcon').toggleClass('d-none')
   $('#delIcon').toggleClass('wiggle')
   $("#delInputGroup").toggleClass("d-none");
-  if(!deleteMode && !addMode)
+if(!deleteMode && !addMode && !infoMode)
   location.reload()
 });
 
 
 
 $(' #introInfo' ).click(function() {
+  infoMode = !infoMode;
 $("#introNotification").toggleClass("d-none");
 $(' #introInfo' ).toggleClass('wiggle')
+if(!deleteMode && !addMode && !infoMode)
+location.reload()
 });
 //$('html').height($('body').height());
 });
