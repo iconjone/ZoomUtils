@@ -1,4 +1,5 @@
-
+  var deleteMode = false;
+  var addMode = false;
 window.addEventListener('load', (event) => {
   $('#introNotification').addClass('d-none')
 showTable()
@@ -17,8 +18,22 @@ $( function() {
     delZOOM();
   });
   $( "#addOption" ).click(function() {
+    addMode = !addMode
+  //  $('#addIcon').toggleClass('d-none')
+    $('#addIcon').toggleClass('wiggle')
     $("#addInputGroup").toggleClass("d-none");
+    if(!addMode && !deleteMode)
+    location.reload()
   });
+  $( "#addIcon" ).click(function() {
+        addMode = !addMode
+    //$('#addIcon').toggleClass('d-none')
+    $('#addIcon').toggleClass('wiggle')
+    $("#addInputGroup").toggleClass("d-none");
+    if(!addMode && !deleteMode)
+    location.reload()
+  });
+
   $('.navbar-nav>li>a').on('click', function(){
       $('.navbar-collapse').collapse('hide');
   });
@@ -28,14 +43,37 @@ $( function() {
       showTable();
     });
   });
-  $(' #delOption' ).click(function() {
+
+$( "#delOption" ).click(function() {
+  deleteMode = !deleteMode
+  if(deleteMode){
+    makeDelListener()
+  }
+//  $('#delIcon').toggleClass('d-none')
+  $('#delIcon').toggleClass('wiggle')
   $("#delInputGroup").toggleClass("d-none");
+  if(!deleteMode && !addMode)
+  location.reload()
 });
+$( "#delIcon" ).click(function() {
+    deleteMode = !deleteMode
+    if(deleteMode){
+      makeDelListener()
+    }
+//  $('#delIcon').toggleClass('d-none')
+  $('#delIcon').toggleClass('wiggle')
+  $("#delInputGroup").toggleClass("d-none");
+  if(!deleteMode && !addMode)
+  location.reload()
+});
+
+
 
 $(' #introInfo' ).click(function() {
 $("#introNotification").toggleClass("d-none");
+$(' #introInfo' ).toggleClass('wiggle')
 });
-
+//$('html').height($('body').height());
 });
 
 
@@ -52,7 +90,7 @@ chrome.storage.sync.get('zoomData', function(data) {
         classElement.innerText = zoom.class;
         meetingID = document.createElement('td')
         meetingID.setAttribute('meetingID', zoom.meetingID)
-        meetingIDSpace = zoom.meetingID.substring(0,3) + " " + zoom.meetingID.substring(3,6) + " " + zoom.meetingID.substring(6,9);
+        meetingIDSpace = zoom.meetingID.substring(0,3) + " " + zoom.meetingID.substring(3,6) + " " + zoom.meetingID.substring(6);
         link = document.createElement('a');
         link.setAttribute('target', 'blank');
         link.setAttribute('href', 'zoommtg://tamu.zoom.us/join?action=join&confno=' + zoom.meetingID)
@@ -70,7 +108,6 @@ chrome.storage.sync.get('zoomData', function(data) {
     })
 
   });
-
 }
 
 function updateTableToJSON(){
@@ -142,4 +179,26 @@ chrome.storage.sync.get('zoomData', function(data) {
 });
 
 
+}
+function makeDelListener(){
+  console.log('ran')
+  console.log($('tbody tr'))
+$('tbody').on('click', 'tr', function( event ) {
+  console.log("running")
+  meetingIDDel = event.target.parentElement.children[1].getAttribute('meetingID');
+  console.log(meetingIDDel)
+  chrome.storage.sync.get('zoomData', function(data) {
+    changed = true;
+    data = JSON.parse(data.zoomData);
+
+     data = data.filter(({meetingID}) => !meetingID.includes(meetingIDDel))
+
+      chrome.storage.sync.set({zoomData: JSON.stringify(data)}, function() {
+        console.log("New Data Set.");
+        showTable()
+      });
+
+
+  });
+});
 }
