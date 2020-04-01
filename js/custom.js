@@ -39,7 +39,7 @@ if(!deleteMode && !addMode && !infoMode)
       $('.navbar-collapse').collapse('hide');
   });
   $('#reset').on('click', function(){
-    chrome.storage.sync.set({zoomData: '[{"class":"ESET 210","meetingID":"123456789","info":"This is an example"}, {"class":"CSCE 222","meetingID":"123456789","info":"HELL MW 2:30 PM"}, {"class":"PHYS 207","meetingID":"123456789","info":"TA SESSION 3:00 PM"}]'}, function() {
+    chrome.storage.sync.set({zoomData: '[{"class":"ESET 210","meetingID":"123456789","info":"Default Settings. Click Info!"}, {"class":"CSCE 222","meetingID":"123456789","info":"HELL MW 2:30 PM"}, {"class":"PHYS 207","meetingID":"123456789","info":"TA SESSION 3:00 PM"}]'}, function() {
       console.log("Installation Set.");
       showTable();
     });
@@ -97,7 +97,7 @@ chrome.storage.sync.get('zoomData', function(data) {
         meetingIDSpace = zoom.meetingID.substring(0,3) + " " + zoom.meetingID.substring(3,6) + " " + zoom.meetingID.substring(6);
         link = document.createElement('a');
         link.setAttribute('target', 'blank');
-        link.setAttribute('href', 'zoommtg://tamu.zoom.us/join?action=join&confno=' + zoom.meetingID)
+        link.setAttribute('href', 'zoommtg://jonathan.zoom.us/join?action=join&confno=' + zoom.meetingID)
         link.innerText = meetingIDSpace;
         meetingID.append(link)
       //  meetingID.innerText = zoom.meetingID;
@@ -142,15 +142,31 @@ function addZOOM(){
   classAdd = document.getElementById('classAdd').value;
   document.getElementById('classAdd').value = '';
   meetID = document.getElementById('meetID').value;
-  meetID = meetID.replace(/\s/g, '');
   document.getElementById('meetID').value = "";
   info = document.getElementById('info').value;
   document.getElementById('info').value = "";
+  meetID = meetID.replace(/\s/g, '');
+   var meetID = meetID.replace(/-/g, "");
+    var patt = new RegExp('\\d\\d\\d\\d\\d\\d\\d\\d\\d+');
+    try{
+      var meetID = patt.exec(meetID)[0];
+    }catch(e){
+      document.getElementById('meetID').value = 'Invalid';
+      document.getElementById('classAdd').value = classAdd;
+      document.getElementById('info').value = info;
+      meetID = null
+      console.warn(e)
+    }
+
+
+
+
 
   object = {};
   object.class = classAdd;
   object.meetingID = meetID;
   object.info = info;
+  if(meetID != null && meetID != undefined && meetID != ''){
 chrome.storage.sync.get('zoomData', function(data) {
   data = JSON.parse(data.zoomData);
   data.push(object)
@@ -160,6 +176,7 @@ chrome.storage.sync.get('zoomData', function(data) {
     showTable()
   });
 });
+}
 
 }
 
@@ -168,11 +185,13 @@ updateTableToJSON();
 meetingIDDel = document.getElementById('meetingIDDel').value;
 document.getElementById('meetingIDDel').value = '';
 meetingIDDel = meetingIDDel.replace(/\s/g, '');
+meetingIDDel = meetingIDDel.replace(/-/g, "");
 chrome.storage.sync.get('zoomData', function(data) {
   changed = true;
   data = JSON.parse(data.zoomData);
+  console.log(data)
 
-   data = data.filter(({meetingID}) => !meetingID.includes(meetingIDDel))
+   data = data.filter(({meetingID}) => meetingID != meetingIDDel)
 
     chrome.storage.sync.set({zoomData: JSON.stringify(data)}, function() {
       console.log("New Data Set.");
@@ -189,13 +208,14 @@ function makeDelListener(){
   console.log($('tbody tr'))
 $('tbody').on('click', 'tr', function( event ) {
   console.log("running")
+  if(deleteMode){
   meetingIDDel = event.target.parentElement.children[1].getAttribute('meetingID');
   console.log(meetingIDDel)
   chrome.storage.sync.get('zoomData', function(data) {
     changed = true;
     data = JSON.parse(data.zoomData);
 
-     data = data.filter(({meetingID}) => !meetingID.includes(meetingIDDel))
+     data = data.filter(({meetingID}) => meetingID != meetingIDDel)
 
       chrome.storage.sync.set({zoomData: JSON.stringify(data)}, function() {
         console.log("New Data Set.");
@@ -204,5 +224,20 @@ $('tbody').on('click', 'tr', function( event ) {
 
 
   });
+}
 });
 }
+
+
+// function notify(title, message ){
+//
+//   chrome.runtime.sendMessage('', {
+//     type: 'notification',
+//     options: {
+//       title: title,
+//       message: message,
+//       iconUrl: 'img/icon128.png',
+//       type: 'basic'
+//     }
+//   });
+// }

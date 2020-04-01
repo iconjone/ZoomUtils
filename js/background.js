@@ -14,3 +14,9 @@ chrome.runtime.onInstalled.addListener(function(details) {
   // chrome.storage.sync.set({zoomData: '[{"class":"ESET 210","meetingID":"756676286","info":"Ta Led class"}, {"class":"ESET 210","meetingID":"756676286","info":"Ta Led class"}]'}, function() {
   //   console.log("The color is working.");
   // });
+
+  // chrome.runtime.onMessage.addListener(data => {
+  //   if (data.type === 'notification') {
+  //     chrome.notifications.create('', data.options);
+  //   }
+  // });
