@@ -1,8 +1,11 @@
   var deleteMode = false;
   var addMode = false;
   var infoMode = false;
+  var darkMode = false;
+document.addEventListener("DOMContentLoaded", setDarkMode);
 window.addEventListener('load', (event) => {
-  $('#introNotification').addClass('d-none')
+
+  //$('#introNotification').addClass('d-none')
 showTable()
 $( function() {
     $( "#appendZoomData" ).sortable({
@@ -78,6 +81,7 @@ if(!deleteMode && !addMode && !infoMode)
 location.reload()
 });
 //$('html').height($('body').height());
+$('#darkIcon').click(toggleDarkMode);
 });
 
 
@@ -226,6 +230,72 @@ $('tbody').on('click', 'tr', function( event ) {
   });
 }
 });
+}
+
+function setDarkMode(){
+  var needReload = false;
+  chrome.storage.sync.get('darkmode', function(data) {
+    console.log(data.darkmode)
+    if(data.darkmode == undefined){
+      needReload = true;
+      chrome.storage.sync.set({darkmode: 'false' }, function() {
+        console.log("Dark mode initiated");
+      });
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        chrome.storage.sync.set({darkmode: 'true' }, function() {
+          console.log("Dark Mode turned on");
+          darkMode = true;
+        });
+    }
+    oneWiggle('#darkIcon')
+    if(needReload){
+      window.setTimeout(function(){
+      location.reload()
+    },1500);
+    }
+  }
+  else if(data.darkmode === "true"){
+    console.log("ran")
+    darkMode = true;
+  }
+
+
+  if(darkMode){
+    console.log("IT CAME HERE")
+var head = document.getElementsByTagName('head')[0];
+darkCss =  document.createElement('link');
+darkCss.setAttribute('href', "css/darkmode.css"); darkCss.setAttribute('rel', "stylesheet"); darkCss.setAttribute('media', "screen");darkCss.setAttribute('id', "darkModeCss")
+head.append(darkCss)
+}
+
+    });
+
+}
+
+function toggleDarkMode(){
+  oneWiggle('#darkIcon')
+  darkMode = !darkMode;
+  if(darkMode){
+    var head = document.getElementsByTagName('head')[0];
+    darkCss =  document.createElement('link');
+    darkCss.setAttribute('href', "css/darkmode.css"); darkCss.setAttribute('rel', "stylesheet"); darkCss.setAttribute('media', "screen");darkCss.setAttribute('id', "darkModeCss")
+    head.append(darkCss)
+  }
+  else{
+    document.getElementById("darkModeCss").remove();
+  }
+  chrome.storage.sync.set({darkmode: darkMode.toString() }, function() {
+    console.log("DarkMode Updated")
+  });
+
+
+}
+
+function oneWiggle(query){
+  $(query).addClass('wiggle');
+  window.setTimeout(function(){
+    $(query).removeClass('wiggle');
+  }, 1500);
 }
 
 
