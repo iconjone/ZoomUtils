@@ -1,6 +1,6 @@
 <template>
-  <v-app id="inspire">
-    <v-navigation-drawer v-model="drawer" app>
+  <v-app id="popup">
+    <v-navigation-drawer v-model="drawer" app right>
       <v-list dense>
         <v-list-item link>
           <v-list-item-action>
@@ -22,8 +22,9 @@
     </v-navigation-drawer>
 
     <v-app-bar app>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>Zoom Utils</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-app-bar-nav-icon short="true" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
     </v-app-bar>
 
     <v-main>
@@ -32,7 +33,7 @@
           <v-col class="text-center">
             <v-tooltip left>
               <template v-slot:activator="{ on }">
-                <v-btn :href="source" icon large target="_blank" v-on="on">
+                <v-btn icon large target="_blank" v-on="on">
                   <v-icon large>mdi-code-tags</v-icon>
                 </v-btn>
               </template>
@@ -43,7 +44,7 @@
       </v-container>
     </v-main>
     <v-footer app>
-      <span class="">&copy; {{ new Date().getFullYear() }} Jonathan Samuel</span>
+      <span class="">&copy; {{ new Date().getFullYear() }} Amacel Web Development</span>
     </v-footer>
   </v-app>
 </template>
