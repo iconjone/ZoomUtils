@@ -34,10 +34,15 @@ browser.runtime.onInstalled.addListener(function(details) {
         console.log('Old string data has been converted to object data');
       }
     });
-
-    console.log(details);
   }
+  console.log(details);
 });
+chrome.storage.sync.get('zoomData', function(data) {
+  console.log('commiting data', data.zoomData);
+  store.commit('UPDATE_ZOOM_DATA', data.zoomData);
+  store.state;
+});
+
 // replicate old users data
 // chrome.storage.sync.set(
 //   {
