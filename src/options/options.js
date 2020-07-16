@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import App from './App';
+import Options from './OptionsBase';
 import store from '../store';
 
 import Vuetify from 'vuetify';
@@ -33,7 +33,6 @@ Vue.prototype.$browser = global.browser;
 new Vue({
   el: '#app',
   store,
-  router,
   vuetify: vuetify,
-  render: h => h(App),
+  render: h => h(Options),
 });

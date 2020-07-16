@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import App from './App';
+import Popup from './PopupBase';
 import store from '../store';
 import router from './router';
 import Vuetify from 'vuetify';
@@ -35,5 +35,5 @@ new Vue({
   store,
   router,
   vuetify: vuetify,
-  render: h => h(App),
+  render: h => h(Popup),
 });
