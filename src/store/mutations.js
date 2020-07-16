@@ -7,4 +7,7 @@ export default {
   [types.UPDATE_ZOOM_DATA](state, payload) {
     state.zoomData = payload;
   },
+  setZoomData(state, payload) {
+    state.zoomData = payload;
+  },
 };

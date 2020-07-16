@@ -26,8 +26,6 @@ browser.runtime.onInstalled.addListener(function(details) {
     );
   } else if (details.reason === 'update') {
     chrome.storage.sync.get('zoomData', function(data) {
-      console.log(data, 'data', typeof data);
-
       if (typeof data.zoomData === 'string' || data.zoomData instanceof String) {
         chrome.storage.sync.set({ zoomData: JSON.parse(data.zoomData) });
 
@@ -36,11 +34,16 @@ browser.runtime.onInstalled.addListener(function(details) {
     });
   }
   console.log(details);
+  chrome.storage.sync.get('zoomData', function(data) {
+    console.log('commiting data', data.zoomData);
+    store.commit('setZoomData', data.zoomData);
+    console.log(store.state.zoomData);
+  });
 });
 chrome.storage.sync.get('zoomData', function(data) {
   console.log('commiting data', data.zoomData);
-  store.commit('UPDATE_ZOOM_DATA', data.zoomData);
-  store.state;
+  store.commit('setZoomData', data.zoomData);
+  console.log(store.state.zoomData);
 });
 
 // replicate old users data

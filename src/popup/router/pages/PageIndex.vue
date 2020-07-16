@@ -37,8 +37,9 @@
                   <v-icon large>mdi-code-tags</v-icon>
                 </v-btn>
               </template>
-              <span>Source{{ zoomData }}</span>
+              <span>Source</span>
             </v-tooltip>
+            {{ zoomData }} HEkis
           </v-col>
         </v-row>
       </v-container>
@@ -50,19 +51,19 @@
 </template>
 
 <script>
-import store from '../store';
 export default {
   data() {
     return { drawer: null };
   },
   computed: {
     zoomData() {
-      console.log('Zoom data', this.$store.state.zoomData[0]);
-      return store.state.zoomData;
+      console.log('Zoom data', this.$store.state.zoomData);
+      return this.$store.state.zoomData;
     },
   },
   created() {
     console.log(this, 'created');
+    console.log('Zoom data', this.$store.state.zoomData);
   },
 };
 </script>
