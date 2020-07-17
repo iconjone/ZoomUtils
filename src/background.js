@@ -45,6 +45,8 @@ chrome.storage.sync.get('zoomData', function(data) {
   store.commit('setZoomData', data.zoomData);
   console.log(store.state.zoomData);
 });
+// https://stackoverflow.com/questions/56815002/store-data-from-background-js-into-the-vuex-store
+/// / TODO: We need to figure out how to use this npm package to pass data from stores.
 
 // replicate old users data
 // chrome.storage.sync.set(
