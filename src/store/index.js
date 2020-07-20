@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import VuexWebExtensions from 'vuex-webextensions';
-
 import * as getters from './getters';
 import mutations from './mutations';
 import * as actions from './actions';
+global.browser = require('webextension-polyfill');
 
 Vue.use(Vuex);
 

@@ -49,8 +49,10 @@ browser.runtime.onInstalled.addListener(function(details) {
       }
     );
   } else if (details.reason === 'update') {
+    console.log('Updating....');
     browser.storage.sync.get('zoomData').then(data => {
       if (typeof data.zoomData === 'string' || data.zoomData instanceof String) {
+        // Process old data and add any needed information.
         browser.storage.sync.set({ zoomData: JSON.parse(data.zoomData) });
 
         console.log('Old string data has been converted to object data');
@@ -58,16 +60,14 @@ browser.runtime.onInstalled.addListener(function(details) {
     });
   }
   console.log(details);
-  browser.storage.sync.get('zoomData').then(data => {
-    console.log('commiting data', data.zoomData);
-    store.dispatch('setZoomData', data.zoomData);
-    console.log(store);
-  });
+  // browser.storage.sync.get('zoomData').then(data => {
+  //   console.log('commiting data', data.zoomData);
+  //   store.dispatch('setZoomData', data.zoomData);
+  //   console.log(store);
+  // });
 });
 browser.storage.sync.get('zoomData').then(data => {
-  console.log('commiting data', data.zoomData);
-  store.dispatch('setZoomData', data.zoomData);
-  console.log(store.state.zoomData);
+  store.dispatch('initZoomData', data.zoomData);
 });
 // https://stackoverflow.com/questions/56815002/store-data-from-background-js-into-the-vuex-store
 /// / TODO: We need to figure out how to use this npm package to pass data from stores.
