@@ -35,26 +35,27 @@ const store = new Vuex.Store({
 console.log('Background Data Loaded..');
 
 browser.runtime.onInstalled.addListener(function(details) {
+  console.log("got here")
   if (details.reason === 'install') {
     browser.storage.sync.set(
       {
-        zoomData: [
-          { class: 'ESET 210', meetingID: '123456789', info: 'Click on the info Icon!' },
+        "zoomData": [
+          { class: 'ESET 210', meetingID: '12345678', info: 'Click on the info Icon!' },
           { class: 'CSCE 222', meetingID: '123456789', info: 'HELL MW 10:20 AM' },
-          { class: 'PHYS 207', meetingID: '123456789', info: 'TA SESSION 3:00 PM' },
+          { class: 'PHYS 207', meetingID: '12345679', info: 'TA SESSION 3:00 PM' },
         ],
-      },
-      function() {
-        console.log('Installation Set.');
       }
-    );
+    ).then(promise=>{
+      console.log(promise, "Installation set")
+    });
   } else if (details.reason === 'update') {
     console.log('Updating....');
     browser.storage.sync.get('zoomData').then(data => {
       if (typeof data.zoomData === 'string' || data.zoomData instanceof String) {
         // Process old data and add any needed information.
-        browser.storage.sync.set({ zoomData: JSON.parse(data.zoomData) });
 
+        var promise = browser.storage.sync.set({ zoomData: JSON.parse(data.zoomData) });
+          console.log(promise)
         console.log('Old string data has been converted to object data');
       }
     });

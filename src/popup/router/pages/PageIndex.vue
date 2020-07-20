@@ -31,15 +31,16 @@
       <v-container class="fill-height" fluid>
         <v-row align="center" justify="center">
           <v-col class="text-center">
-            <v-tooltip left>
-              <template v-slot:activator="{ on }">
-                <v-btn icon large target="_blank" v-on="on">
-                  <v-icon large>mdi-code-tags</v-icon>
-                </v-btn>
-              </template>
-              <span>Source</span>
-            </v-tooltip>
-            {{ zoomData }} HEkis
+
+            <draggable v-model="zoomData">
+ <transition-group>
+      <v-card  class="mt-4" v-for="element in zoomData" :key="element.meetingID">
+              {{element.class}} || {{element.meetingID}} || {{element.info}}
+      </v-card>
+</transition-group>
+
+</draggable>
+
           </v-col>
         </v-row>
       </v-container>
@@ -51,20 +52,30 @@
 </template>
 
 <script>
+import draggable from 'vuedraggable'
+import { mapActions } from 'vuex'
 export default {
+
   data() {
     return { drawer: null };
   },
+  components: {
+           draggable,
+  },
+  methods:{
+    ...mapActions(['setZoomData']),
+  },
   computed: {
-    zoomData() {
-      console.log('Zoom data', this.$store.state.zoomData);
-      return this.$store.state.zoomData;
+    zoomData: {
+      get(){return this.$store.state.zoomData;},
+      set(value){this.$store.dispatch('setZoomData', value)}
+
+
     },
   },
   created() {
     console.log(this, 'created');
-    console.log('Zoom data', this.$store.state.zoomData);
-  },
+  }
 };
 </script>
 
