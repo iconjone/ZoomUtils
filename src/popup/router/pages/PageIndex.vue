@@ -54,6 +54,7 @@
 <script>
 import draggable from 'vuedraggable'
 import { mapActions } from 'vuex'
+
 export default {
 
   data() {
@@ -68,7 +69,7 @@ export default {
   computed: {
     zoomData: {
       get(){return this.$store.state.zoomData;},
-      set(value){this.$store.dispatch('setZoomData', value)}
+      set(value){this.$store.dispatch("setZoomData", value)}
 
 
     },
