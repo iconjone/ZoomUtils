@@ -32,14 +32,33 @@
         <v-row align="center" justify="center">
           <v-col class="text-center">
 
-            <draggable v-model="zoomData">
- <transition-group>
-      <v-card  class="mt-4" v-for="element in zoomData" :key="element.meetingID">
-              {{element.class}} || {{element.meetingID}} || {{element.info}}
-      </v-card>
-</transition-group>
+            <v-simple-table >
+                    <thead >
+                      <tr>
+                        <th scope="col">Class</th>
+                        <th scope="col">Meetings</th>
+                        <th scope="col">Info</th>
+                      </tr>
+                    </thead>
+                      <draggable v-model="zoomData" tag="tbody">
 
-</draggable>
+                           <tr  v-for="element in zoomData" :key="element.meetingID">
+                             <td >{{ element.class }}</td>
+                             <td>{{ element.meetingID }}</td>
+                             <td>{{ element.info }}</td>
+                           </tr>
+
+
+                     </draggable>
+                    </tbody>
+
+
+                  </v-simple-table>
+
+
+
+
+
 
           </v-col>
         </v-row>
