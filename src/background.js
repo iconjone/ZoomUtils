@@ -1,5 +1,29 @@
-import store from './store';
+// import store from './store';
+import Vue from 'vue';
+import Vuex from 'vuex';
+import VuexWebExtensions from 'vuex-webextensions';
+
+import * as actions from './store/actions';
+import * as getters from './store/getters';
+import mutations from './store/mutations';
+
 global.browser = require('webextension-polyfill');
+
+Vue.use(Vuex);
+
+const store = new Vuex.Store({
+  plugins: [
+    VuexWebExtensions({
+      //  persistentStates: ['currentTabUrl'],
+    }),
+  ],
+  state: {
+    //  currentTabUrl: '',
+  },
+  getters,
+  mutations,
+  actions,
+});
 
 // browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 //   console.log('Hello from the background');
@@ -36,13 +60,13 @@ browser.runtime.onInstalled.addListener(function(details) {
   console.log(details);
   browser.storage.sync.get('zoomData').then(data => {
     console.log('commiting data', data.zoomData);
-    store.commit('setZoomData', data.zoomData);
-    console.log(store.state.zoomData);
+    store.dispatch('setZoomData', data.zoomData);
+    console.log(store);
   });
 });
 browser.storage.sync.get('zoomData').then(data => {
   console.log('commiting data', data.zoomData);
-  store.commit('setZoomData', data.zoomData);
+  store.dispatch('setZoomData', data.zoomData);
   console.log(store.state.zoomData);
 });
 // https://stackoverflow.com/questions/56815002/store-data-from-background-js-into-the-vuex-store
