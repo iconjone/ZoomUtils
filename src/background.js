@@ -25,22 +25,22 @@ browser.runtime.onInstalled.addListener(function(details) {
       }
     );
   } else if (details.reason === 'update') {
-    chrome.storage.sync.get('zoomData', function(data) {
+    browser.storage.sync.get('zoomData').then(data => {
       if (typeof data.zoomData === 'string' || data.zoomData instanceof String) {
-        chrome.storage.sync.set({ zoomData: JSON.parse(data.zoomData) });
+        browser.storage.sync.set({ zoomData: JSON.parse(data.zoomData) });
 
         console.log('Old string data has been converted to object data');
       }
     });
   }
   console.log(details);
-  chrome.storage.sync.get('zoomData', function(data) {
+  browser.storage.sync.get('zoomData').then(data => {
     console.log('commiting data', data.zoomData);
     store.commit('setZoomData', data.zoomData);
     console.log(store.state.zoomData);
   });
 });
-chrome.storage.sync.get('zoomData', function(data) {
+browser.storage.sync.get('zoomData').then(data => {
   console.log('commiting data', data.zoomData);
   store.commit('setZoomData', data.zoomData);
   console.log(store.state.zoomData);
