@@ -35,9 +35,9 @@
     </v-app-bar>
 
     <v-main>
-      <v-container class="fill-height" fluid>
-        <v-row align="center" justify="center">
-          <v-col class="text-center">
+      <!-- <v-container class="fill-height" > -->
+        <!-- <v-row align="center" justify="center">
+          <v-col class="text-center"> -->
 
             <v-simple-table >
                     <thead >
@@ -57,6 +57,7 @@
 
 
                      </draggable>
+
                     </tbody>
 
 
@@ -67,9 +68,9 @@
 
 
 
-          </v-col>
-        </v-row>
-      </v-container>
+          <!-- </v-col>
+        </v-row> -->
+      <!-- </v-container> -->
     </v-main>
     <v-footer app>
       <span class="">&copy; {{ new Date().getFullYear() }} Amacel Web Development</span>
