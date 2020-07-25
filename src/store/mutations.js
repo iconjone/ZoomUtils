@@ -6,5 +6,8 @@ export default {
   },
   [types.UPDATE_ZOOM_DATA](state, payload) {
     state.zoomData = payload;
+  },
+  [types.UPDATE_DARK_MODE](state, payload) {
+    state.darkmode = payload;
   }
 };

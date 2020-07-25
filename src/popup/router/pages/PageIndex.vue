@@ -1,7 +1,7 @@
 <template>
   <v-app id="popup">
     <v-navigation-drawer v-model="drawer" app right>
-      <v-list dense>
+      <v-list>
         <v-list-item link>
           <v-list-item-action>
             <v-icon>mdi-home</v-icon>
@@ -17,6 +17,13 @@
           <v-list-item-content>
             <v-list-item-title>Contact</v-list-item-title>
           </v-list-item-content>
+        </v-list-item>
+        <v-list-item>
+          <v-icon>mdi-weather-sunny</v-icon>
+          <v-list-item-action>
+            <v-switch v-model="isDark" inset></v-switch>
+          </v-list-item-action>
+          <v-icon class="pl-2">mdi-weather-night</v-icon>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
@@ -40,7 +47,7 @@
                         <th scope="col">Info</th>
                       </tr>
                     </thead>
-                      <draggable v-model="zoomData" tag="tbody">
+                      <draggable v-model="zoomData" tag="tbody" >
 
                            <tr  v-for="element in zoomData" :key="element.meetingID">
                              <td >{{ element.class }}</td>
@@ -83,7 +90,7 @@ export default {
            draggable,
   },
   methods:{
-    ...mapActions(['setZoomData']),
+    ...mapActions(['setZoomData'],['setDarkMode']),
   },
   computed: {
     zoomData: {
@@ -92,9 +99,36 @@ export default {
 
 
     },
+    isDark: {
+      get(){return this.$store.state.darkmode;},
+      set(value){this.$store.dispatch("setDarkMode", value)}
+
+
+    }
+
   },
   created() {
     console.log(this, 'created');
+    // if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    //   browser.storage.sync.set(
+    //     {darkmode: 'true' }
+    //   ).then(promise=>{
+    //     console.log(promise, "Darkmode Set")
+    //   });
+    //   console.log("dark Mode")
+    // }else{
+    //   browser.storage.sync.set(
+    //     {darkmode: 'false' }
+    //   ).then(promise=>{
+    //     console.log(promise, "Darkmode Set")
+    //   });
+    //   console.log("light Mode")
+    // }
+  },
+  watch: {
+    isDark() {
+      this.$vuetify.theme.dark = this.isDark
+    }
   }
 };
 </script>

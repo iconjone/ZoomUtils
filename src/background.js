@@ -48,6 +48,22 @@ browser.runtime.onInstalled.addListener(function(details) {
     ).then(promise=>{
       console.log(promise, "Installation set")
     });
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      browser.storage.sync.set(
+        {darkmode: 'true' }
+      ).then(promise=>{
+        console.log(promise, "Darkmode Set")
+      });
+      console.log("dark Mode")
+    }else{
+      browser.storage.sync.set(
+        {darkmode: 'false' }
+      ).then(promise=>{
+        console.log(promise, "Darkmode Set")
+      });
+      console.log("light Mode")
+    }
+initStore()
   } else if (details.reason === 'update') {
     console.log('Updating....');
     browser.storage.sync.get('zoomData').then(data => {
@@ -59,7 +75,12 @@ browser.runtime.onInstalled.addListener(function(details) {
         console.log('Old string data has been converted to object data');
       }
     });
+
+    initStore()
   }
+  // else{
+  //   initStore()
+  // }
   console.log(details);
   // browser.storage.sync.get('zoomData').then(data => {
   //   console.log('commiting data', data.zoomData);
@@ -67,9 +88,17 @@ browser.runtime.onInstalled.addListener(function(details) {
   //   console.log(store);
   // });
 });
-browser.storage.sync.get('zoomData').then(data => {
+initStore()
+//needs to run after above function
+function initStore(){
+browser.storage.sync.get().then(data=>{
+  console.log(data)
   store.dispatch('initZoomData', data.zoomData);
-});
+  store.dispatch('initDarkMode', data.darkmode);
+
+})
+}
+
 // https://stackoverflow.com/questions/56815002/store-data-from-background-js-into-the-vuex-store
 /// / TODO: We need to figure out how to use this npm package to pass data from stores.
 
