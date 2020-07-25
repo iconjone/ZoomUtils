@@ -14,7 +14,7 @@ export default {
 
 <style>
 html {
-  width: 400px;
+  width: 500px;
   min-height: 200px;
 }
 </style>
