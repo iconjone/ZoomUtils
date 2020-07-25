@@ -2,7 +2,7 @@
   <v-app id="popup">
     <v-navigation-drawer v-model="drawer" app right>
       <v-list>
-        <v-list-item link>
+        <v-list-item  @click="addDialog = true">
           <v-list-item-action>
             <v-icon>mdi-plus</v-icon>
           </v-list-item-action>
@@ -41,7 +41,7 @@
       <v-spacer></v-spacer>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-icon v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+          <v-icon v-bind="attrs" v-on="on" @click="infoDialog = true">mdi-information-outline</v-icon>
         </template>
         <span>Learn More</span>
       </v-tooltip>
@@ -109,23 +109,107 @@
       <!-- </v-col>
         </v-row> -->
       <!-- </v-container> -->
+
     </v-main>
     <v-footer app>
       <span class="">&copy; {{ new Date().getFullYear() }} Amacel Web Development</span>
     </v-footer>
+    <div class="text-center">
+      <v-dialog
+        v-model="infoDialog"
+        width="500"
+      >
+        <v-card>
+          <v-card-title>
+            Information
+          </v-card-title>
+          <v-card-subtitle>
+            Concerning the blah blah
+          </v-card-subtitle>
+
+          <v-card-text>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          </v-card-text>
+
+          <v-divider></v-divider>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="primary"
+              text
+              @click="infoDialog = false"
+            > Close
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog
+        v-model="addDialog"
+        width="500"
+      >
+        <v-card>
+          <v-card-title>
+            Add
+          </v-card-title>
+          <v-card-subtitle>
+            <v-btn class="ma-2">
+      <v-icon left>mdi-magnify</v-icon> Add from links on current Page
+    </v-btn>
+          </v-card-subtitle>
+
+          <v-card-text>
+
+              <v-row>
+                <v-col cols="6" >
+                  <v-text-field label="Zoom Class Name" required></v-text-field>
+                </v-col>
+                <v-col cols="6" >
+                  <v-text-field label="Info" required></v-text-field>
+                </v-col>
+                <v-col cols="12" >
+                  <v-text-field label="Meeting Id" hint="9-11 digit number" type="number"></v-text-field>
+                </v-col>
+
+
+              </v-row>
+
+</v-card-text>
+          <v-divider></v-divider>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="success"
+              text
+              @click="addDialog = false"
+            > Add
+            </v-btn>
+            <v-btn
+              color="primary"
+              text
+              @click="addDialog = false"
+            > Cancel
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </div>
   </v-app>
+
 </template>
 
 <script>
 import draggable from 'vuedraggable';
+
 import { mapActions } from 'vuex';
 
 export default {
   data() {
-    return { drawer: null };
+    return { drawer: null, infoDialog:false, addDialog:false };
   },
   components: {
-    draggable,
+    draggable
   },
   methods: {
     ...mapActions(['setZoomData'], ['setDarkMode']),
