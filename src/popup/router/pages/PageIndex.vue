@@ -66,7 +66,7 @@
       </v-tooltip>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-badge color="secondary" :value="modeIcon" :icon="modeIcon" offset-x="20" offset-y="20">
+          <v-badge color="secondary" :value="modeIcon" :icon="modeIcon + ''" offset-x="20" offset-y="20">
             <v-app-bar-nav-icon v-bind="attrs" v-on="on" short="true" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
           </v-badge>
         </template>
@@ -165,9 +165,7 @@
           </v-card-subtitle>
 
           <v-card-text>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            SOmething about clicking "Always allow chrome extension to open links of thiws type in the assocauted app"
           </v-card-text>
 
           <v-divider></v-divider>
@@ -184,7 +182,7 @@
             Add
           </v-card-title>
           <v-card-subtitle>
-            <v-btn class="ma-2"> <v-icon left>mdi-magnify</v-icon> Add from links on current Page </v-btn>
+            <v-btn class="ma-2"> <v-icon left>mdi-magnify</v-icon> Add Data from links on current Page </v-btn>
           </v-card-subtitle>
 
           <v-card-text>
