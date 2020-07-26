@@ -5,7 +5,9 @@ import store from '../store';
 import Vuetify from 'vuetify';
 import 'vuetify/dist/vuetify.min.css';
 import 'material-design-icons-iconfont/dist/material-design-icons.css';
+import '@mdi/font/css/materialdesignicons.css';
 import '../fonts/Roboto/font_roboto.css';
+
 Vue.use(Vuetify);
 const vuetify = new Vuetify({
   theme: {
@@ -17,8 +19,8 @@ const vuetify = new Vuetify({
         error: '#b71c1c',
       },
       dark: {
-        primary: '#002f57',
-        secondary: '#4dacfe',
+        primary: '#4dacfe',
+        secondary: '#002f57',
         accent: '#38f527',
         error: '#b71c1c',
       },

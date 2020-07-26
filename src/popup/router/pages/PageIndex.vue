@@ -45,6 +45,15 @@
             <v-list-item-title>Edit</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-divider></v-divider>
+        <v-list-item @click="openSettings()">
+          <v-list-item-action>
+            <v-icon>mdi-cog</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Settings</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
         <v-list-item>
           <v-icon>mdi-weather-sunny</v-icon>
           <v-list-item-action>
@@ -133,15 +142,31 @@
                   <v-col cols="2" class="center-list text-center">
                     {{ element.class }}
                   </v-col>
-                  <v-col style="ps-4" cols="4">
+                  <v-col class="ps-4" cols="4">
                     <v-btn target="blank" :href="generateZoomLink(element)" class="mx-4" style="width:100%" color="secondary">{{ element.meetingID }}</v-btn>
                   </v-col>
-                  <v-col style="pl-4" class="center-list text-center">
+                  <v-col class=" pl-4 center-list text-center">
                     {{ element.info }}
                   </v-col>
                 </v-row>
               </v-expansion-panel-header>
-              <v-expansion-panel-content> {{ element.info }}</v-expansion-panel-content>
+              <v-expansion-panel-content>
+                <v-row>
+                  <v-col class="center-list text-center">
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn icon @click="editZoomData(element)" v-bind="attrs" v-on="on">
+                          <v-icon>mdi-calendar</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>Schedule {{ element.class }}</span>
+                    </v-tooltip>
+                  </v-col>
+                  <v-col>
+                    <v-switch v-model="element.notification" label="Notifications"></v-switch>
+                  </v-col>
+                </v-row>
+              </v-expansion-panel-content>
             </v-expansion-panel>
           </transition-group>
         </draggable>
@@ -302,6 +327,9 @@ export default {
         }
       });
       this.zoomData = currentData;
+    },
+    openSettings() {
+      browser.runtime.openOptionsPage();
     },
     getLinks() {
       browser.tabs.executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' }).then(results => {
