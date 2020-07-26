@@ -182,7 +182,7 @@
             Add
           </v-card-title>
           <v-card-subtitle>
-            <v-btn class="ma-2"> <v-icon left>mdi-magnify</v-icon> Add Data from links on current Page </v-btn>
+            <v-btn class="ma-2" @click="getLinks()"> <v-icon left>mdi-magnify</v-icon> Add Data from links on current Page </v-btn>
           </v-card-subtitle>
 
           <v-card-text>
@@ -212,6 +212,7 @@
                   editZoomDataDiag();
                 }
                 addDialog = false;
+                clearZoomDataDialog();
               "
             >
               {{ editModeText }}
@@ -237,6 +238,7 @@
 import draggable from 'vuedraggable';
 
 import { mapActions } from 'vuex';
+global.browser = require('webextension-polyfill');
 
 export default {
   data() {
@@ -301,7 +303,14 @@ export default {
       });
       this.zoomData = currentData;
     },
+    getLinks() {
+      browser.tabs.executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' }).then(results => {
+        console.log(results[0]);
+        return results[0];
+      });
+    },
     parseLinks(link) {
+      // https://stackoverflow.com/questions/11684454/getting-the-source-html-of-the-current-page-from-chrome-extension
       var link;
 
       console.log(link);
