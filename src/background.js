@@ -35,48 +35,46 @@ const store = new Vuex.Store({
 console.log('Background Data Loaded..');
 
 browser.runtime.onInstalled.addListener(function(details) {
-  console.log("got here")
+  console.log('got here');
   if (details.reason === 'install') {
-    browser.storage.sync.set(
-      {
-        "zoomData": [
-          { class: 'ESET 210', meetingID: '12345678', info: 'Click on the info Icon!' },
-          { class: 'CSCE 222', meetingID: '123456789', info: 'HELL MW 10:20 AM' },
-          { class: 'PHYS 207', meetingID: '12345679', info: 'TA SESSION 3:00 PM' },
+    browser.storage.sync
+      .set({
+        zoomData: [
+          { class: 'ESET 210', meetingID: '12345678', info: 'Click on the info Icon!', key: 1 },
+          { class: 'CSCE 222', meetingID: '123456789', info: 'HELL MW 10:20 AM', key: 2 },
+          { class: 'PHYS 207', meetingID: '12345679', info: 'TA SESSION 3:00 PM', key: 3 },
         ],
-      }
-    ).then(promise=>{
-      console.log(promise, "Installation set")
-    });
+      })
+      .then(promise => {
+        console.log(promise, 'Installation set');
+      });
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      browser.storage.sync.set(
-        {darkmode: 'true' }
-      ).then(promise=>{
-        console.log(promise, "Darkmode Set")
+      browser.storage.sync.set({ darkmode: 'true' }).then(promise => {
+        console.log(promise, 'Darkmode Set');
       });
-      console.log("dark Mode")
-    }else{
-      browser.storage.sync.set(
-        {darkmode: 'false' }
-      ).then(promise=>{
-        console.log(promise, "Darkmode Set")
+      console.log('dark Mode');
+    } else {
+      browser.storage.sync.set({ darkmode: 'false' }).then(promise => {
+        console.log(promise, 'Darkmode Set');
       });
-      console.log("light Mode")
+      console.log('light Mode');
     }
-initStore()
+    initStore();
   } else if (details.reason === 'update') {
     console.log('Updating....');
     browser.storage.sync.get('zoomData').then(data => {
       if (typeof data.zoomData === 'string' || data.zoomData instanceof String) {
         // Process old data and add any needed information.
-
-        var promise = browser.storage.sync.set({ zoomData: JSON.parse(data.zoomData) });
-          console.log(promise)
+        var zoomData = JSON.parse(data.zoomData);
+        zoomData.forEach((item, i) => {
+          zoomData[i].key = i;
+        });
+        var promise = browser.storage.sync.set({ zoomData: zoomData });
+        console.log(promise);
         console.log('Old string data has been converted to object data');
       }
+      initStore();
     });
-
-    initStore()
   }
   // else{
   //   initStore()
@@ -88,15 +86,14 @@ initStore()
   //   console.log(store);
   // });
 });
-initStore()
-//needs to run after above function
-function initStore(){
-browser.storage.sync.get().then(data=>{
-  console.log(data)
-  store.dispatch('initZoomData', data.zoomData);
-  store.dispatch('initDarkMode', data.darkmode);
-
-})
+initStore();
+// needs to run after above function
+function initStore() {
+  browser.storage.sync.get().then(data => {
+    console.log(data);
+    store.dispatch('initZoomData', data.zoomData);
+    store.dispatch('initDarkMode', data.darkmode);
+  });
 }
 
 // https://stackoverflow.com/questions/56815002/store-data-from-background-js-into-the-vuex-store
