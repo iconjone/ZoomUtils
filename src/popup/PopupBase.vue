@@ -15,6 +15,6 @@ export default {
 <style>
 html {
   width: 600px;
-  min-height: 200px;
+  min-height: 210px;
 }
 </style>

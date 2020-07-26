@@ -256,6 +256,7 @@ export default {
   components: {
     draggable,
   },
+
   methods: {
     ...mapActions(['setZoomData'], ['setDarkMode']),
     generateZoomLink(zoomData) {
