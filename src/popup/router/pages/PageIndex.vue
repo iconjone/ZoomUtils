@@ -1,80 +1,80 @@
 <template>
   <v-app id="popup">
-    <v-navigation-drawer v-model="drawer" app right>
-      <v-list>
-        <v-list-item
-          @click="
-            addDialog = true;
-            drawer = false;
-          "
-          :disabled="deleteMode || editMode"
-        >
-          <v-list-item-action>
-            <v-icon>mdi-plus</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Add</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item
-          active
-          @click="
-          if(deleteMode)
-          drawer = true;
-          else
-          drawer = false
-          deleteMode = !deleteMode;
+    <v-navigation-drawer v-model="drawer" app right width="true">
+      <v-layout column fill-height>
+        <v-list>
+          <v-list-item
+            @click="
+              addDialog = true;
+              drawer = false;
+            "
+            :disabled="deleteMode || editMode"
+          >
+            <v-list-item-action>
+              <v-icon>mdi-plus</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Add</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item
+            active
+            @click="
+              if (deleteMode) drawer = true;
+              else drawer = false;
+              deleteMode = !deleteMode;
+            "
+            :disabled="editMode"
+          >
+            <v-list-item-action>
+              <v-icon>mdi-delete</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Delete</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item
+            @click="
+              if (editMode) drawer = true;
+              else drawer = false;
+              editMode = !editMode;
+            "
+            :disabled="deleteMode"
+          >
+            <v-list-item-action>
+              <v-icon>mdi-pencil</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Edit</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
 
-
-          "
-          :disabled="editMode"
-        >
-          <v-list-item-action>
-            <v-icon>mdi-delete</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Delete</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item
-          @click="
-          if(editMode)
-          drawer = true;
-          else
-          drawer = false
-            editMode = !editMode;
-
-          "
-          :disabled="deleteMode"
-        >
-          <v-list-item-action>
-            <v-icon>mdi-pencil</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Edit</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+        <v-spacer></v-spacer>
         <v-divider></v-divider>
-        <v-list-item @click="openSettings()">
-          <v-list-item-action>
-            <v-icon>mdi-cog</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Settings</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item>
-          <v-icon>mdi-weather-sunny</v-icon>
-          <v-list-item-action>
-            <v-switch v-model="isDark" inset></v-switch>
-          </v-list-item-action>
-          <v-icon class="pl-2">mdi-weather-night</v-icon>
-        </v-list-item>
-      </v-list>
+        <v-list>
+          <v-list-item @click="openSettings()">
+            <v-list-item-action>
+              <v-icon>mdi-cog</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Settings</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item>
+            <v-icon>mdi-weather-sunny</v-icon>
+            <v-list-item-action>
+              <v-switch v-model="isDark" inset color="primary"></v-switch>
+            </v-list-item-action>
+            <v-icon class="pl-2">mdi-weather-night</v-icon>
+          </v-list-item>
+        </v-list>
+      </v-layout>
     </v-navigation-drawer>
 
     <v-app-bar app>
       <v-toolbar-title>Zoom Utils</v-toolbar-title>
+      <v-btn v-if="zoomLinkFound" class="ma-2" @click="parseLinks()" color="secondary"> <v-icon left>mdi-plus</v-icon> Add ZOOM Link from Page </v-btn>
       <v-spacer></v-spacer>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
@@ -152,7 +152,7 @@
                     {{ element.class }}
                   </v-col>
                   <v-col class="ps-4" cols="4">
-                    <v-btn target="blank" :href="generateZoomLink(element)" class="mx-4" style="width:100%" color="secondary">{{ element.meetingID }}</v-btn>
+                    <v-btn target="blank" :href="generateZoomLink(element)" class="mx-4" style="width:100%; " color="primary">{{ element.meetingID }}</v-btn>
                   </v-col>
                   <v-col class=" pl-4 center-list text-center">
                     {{ element.info }}
@@ -216,7 +216,7 @@
             Add
           </v-card-title>
           <v-card-subtitle>
-            <v-btn class="ma-2" @click="getLinks()"> <v-icon left>mdi-magnify</v-icon> Add Data from links on current Page </v-btn>
+            text
           </v-card-subtitle>
 
           <v-card-text>
@@ -236,12 +236,7 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn
-              color="success"
-              text
-              @click="handleAddEdit()"
-
-            >
+            <v-btn color="success" text @click="handleAddEdit()">
               {{ editModeText }}
             </v-btn>
             <v-btn
@@ -257,6 +252,15 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <v-snackbar v-model="alert" :multi-line="true">
+        {{ alertText }}
+
+        <template v-slot:action="{ attrs }">
+          <v-btn color="red" text v-bind="attrs" @click="alert = false">
+            Close
+          </v-btn>
+        </template>
+      </v-snackbar>
     </div>
   </v-app>
 </template>
@@ -280,6 +284,9 @@ export default {
       deleteMode: false,
       editMode: false,
       editKey: null,
+      zoomLinkFound: false,
+      alert: false,
+      alertText: 'No Message',
     };
   },
   components: {
@@ -291,17 +298,21 @@ export default {
     generateZoomLink(zoomData) {
       return 'zoommtg://jonathan.zoom.us/join?action=join&confno=' + zoomData.meetingID;
     },
+    customAlert(msg) {
+      this.alertText = msg;
+      this.alert = true;
+    },
     clearZoomDataDialog() {
       this.inputZoomId = this.inputZoomName = this.inputZoomInfo = null;
     },
     addZoomData() {
       var currentData = this.zoomData;
-      var newString = ""
-      currentData.forEach(data=>{
-        if(data.key == this.inputZoomId + this.inputZoomName + this.inputZoomInfo){
-          newString+="keyAdd"
+      var newString = '';
+      currentData.forEach(data => {
+        if (data.key == this.inputZoomId + this.inputZoomName + this.inputZoomInfo) {
+          newString += 'keyAdd';
         }
-      })
+      });
 
       currentData.push({
         class: this.inputZoomName,
@@ -337,23 +348,32 @@ export default {
       });
       this.zoomData = currentData;
     },
-    handleAddEdit(){
-      if(this.validateData()){ if (!this.editMode) {     this.addZoomData();    } else {   this.editZoomDataDiag();  }     this.addDialog = false;  this.clearZoomDataDialog();  }else{alert("something went wrong")}
+    handleAddEdit() {
+      if (this.validateData()) {
+        if (!this.editMode) {
+          this.addZoomData();
+        } else {
+          this.editZoomDataDiag();
+        }
+        this.addDialog = false;
+        this.clearZoomDataDialog();
+      } else {
+        this.customAlert('something went wrong');
+      }
     },
-    validateData(){
-      var meetingIdStr = this.inputZoomId + ""
-      if(meetingIdStr.length >=9 && !isNaN(meetingIdStr))
-      {
+    validateData() {
+      var meetingIdStr = this.inputZoomId + '';
+      if (meetingIdStr.length >= 9 && !isNaN(meetingIdStr)) {
         return true;
       }
-      //return false if not, return true if it is
+      // return false if not, return true if it is
 
-      //this.inputZoomName = zoomData.class;
+      // this.inputZoomName = zoomData.class;
       // this.inputZoomId = zoomData.meetingID;
       // this.inputZoomInfo = zoomData.info;
-      //this.inputZoomId + this.inputZoomName + this.inputZoomInfo //key
+      // this.inputZoomId + this.inputZoomName + this.inputZoomInfo //key
 
-      return false
+      return false;
     },
     openSettings() {
       browser.runtime.openOptionsPage();
@@ -366,12 +386,25 @@ export default {
     },
     parseLinks(link) {
       // https://stackoverflow.com/questions/11684454/getting-the-source-html-of-the-current-page-from-chrome-extension
-      var link;
-
-      console.log(link);
-      // print() = console.log()
-
-      return false;
+      browser.tabs.executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' }).then(results => {
+        var links = results[0];
+        var linksFound = [];
+        links.forEach((link, i) => {
+          if (link.includes('zoom')) {
+            // do some magic to determine if is zoom link
+            if (link.search('/[a-z]/\\d\\d\\d\\d\\d\\d\\d\\d\\d+') != -1) {
+              linksFound.push(link);
+            }
+          }
+        });
+        if (linksFound.length > 0) {
+          var link = linksFound[0];
+          this.inputZoomId = link.match('\\d\\d\\d\\d\\d\\d\\d\\d\\d+')[0];
+          this.addDialog = true;
+        } else {
+          customAlert('Could not find any Zoom Links :(');
+        }
+      });
     },
 
     // sendNotification(title, message)
@@ -412,6 +445,19 @@ export default {
   },
   created() {
     console.log(this, 'created');
+
+    browser.tabs.executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' }).then(results => {
+      results[0].forEach((item, i) => {
+        if (item.includes('zoom')) {
+          // do some magic to determine if is zoom link
+          if (item.search('/[a-z]/\\d\\d\\d\\d\\d\\d\\d\\d\\d+') != -1) {
+            console.log('found');
+            this.zoomLinkFound = true;
+          }
+        }
+      });
+      // return results[0];
+    });
   },
   watch: {
     isDark() {
@@ -442,5 +488,24 @@ p {
 }
 .no-move {
   transition: transform 0s;
+}
+
+::-webkit-scrollbar {
+  width: 15px;
+}
+
+::-webkit-scrollbar-track {
+  background: #202020;
+  border-left: 1px solid #2c2c2c;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3e3e3e;
+  border: solid 3px #202020;
+  border-radius: 7px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: white;
 }
 </style>

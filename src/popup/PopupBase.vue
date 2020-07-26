@@ -15,7 +15,7 @@ export default {
 <style>
 html {
   width: 600px;
-  /* height: 100vh; */
+  min-height: 300px;
 
   /* white-space: nowrap; */
 }

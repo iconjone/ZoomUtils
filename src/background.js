@@ -95,15 +95,13 @@ function initStore() {
     store.dispatch('initDarkMode', data.darkmode);
   });
 }
+
 browser.tabs.onActivated.addListener(listener => {
   browser.tabs.executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' }).then(results => {
     results[0].forEach((item, i) => {
       if (item.includes('zoom')) {
         // do some magic to determine if is zoom link
         if (item.search('/[a-z]/\\d\\d\\d\\d\\d\\d\\d\\d\\d+') != -1) {
-          // console.log('found');
-          // console.log(item);
-          // console.log(listener);
           browser.browserAction.setBadgeText({ text: 'ADD', tabId: listener.tabId });
         }
       }
