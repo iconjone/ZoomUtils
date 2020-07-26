@@ -261,7 +261,7 @@ export default {
   methods: {
     ...mapActions(['setZoomData'], ['setDarkMode']),
     generateZoomLink(zoomData) {
-      return 'zoommtg://jonathan.zoom.us/join?action=join&amp;confno=' + zoomData.meetingID;
+      return 'zoommtg://jonathan.zoom.us/join?action=join&confno=' + zoomData.meetingID;
     },
     clearZoomDataDialog() {
       this.inputZoomId = this.inputZoomName = this.inputZoomInfo = null;
