@@ -95,6 +95,23 @@ function initStore() {
     store.dispatch('initDarkMode', data.darkmode);
   });
 }
+browser.tabs.onActivated.addListener(listener => {
+  browser.tabs.executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' }).then(results => {
+    results[0].forEach((item, i) => {
+      if (item.includes('zoom')) {
+        // do some magic to determine if is zoom link
+        if (item.search('/[a-z]/\\d\\d\\d\\d\\d\\d\\d\\d\\d+') != -1) {
+          // console.log('found');
+          // console.log(item);
+          // console.log(listener);
+          browser.browserAction.setBadgeText({ text: 'ADD', tabId: listener.tabId });
+        }
+      }
+    });
+
+    // return results[0];
+  });
+});
 
 // https://stackoverflow.com/questions/56815002/store-data-from-background-js-into-the-vuex-store
 /// / TODO: We need to figure out how to use this npm package to pass data from stores.
