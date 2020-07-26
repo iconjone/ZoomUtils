@@ -19,8 +19,13 @@
         <v-list-item
           active
           @click="
-            deleteMode = !deleteMode;
-            drawer = false;
+          if(deleteMode)
+          drawer = true;
+          else
+          drawer = false
+          deleteMode = !deleteMode;
+
+
           "
           :disabled="editMode"
         >
@@ -33,8 +38,12 @@
         </v-list-item>
         <v-list-item
           @click="
+          if(editMode)
+          drawer = true;
+          else
+          drawer = false
             editMode = !editMode;
-            drawer = false;
+
           "
           :disabled="deleteMode"
         >
@@ -230,15 +239,8 @@
             <v-btn
               color="success"
               text
-              @click="
-                if (!editMode) {
-                  addZoomData();
-                } else {
-                  editZoomDataDiag();
-                }
-                addDialog = false;
-                clearZoomDataDialog();
-              "
+              @click="handleAddEdit()"
+
             >
               {{ editModeText }}
             </v-btn>
@@ -294,11 +296,18 @@ export default {
     },
     addZoomData() {
       var currentData = this.zoomData;
+      var newString = ""
+      currentData.forEach(data=>{
+        if(data.key == this.inputZoomId + this.inputZoomName + this.inputZoomInfo){
+          newString+="keyAdd"
+        }
+      })
+
       currentData.push({
         class: this.inputZoomName,
         meetingID: this.inputZoomId,
         info: this.inputZoomInfo,
-        key: this.inputZoomId + this.inputZoomName + this.inputZoomInfo,
+        key: this.inputZoomId + this.inputZoomName + this.inputZoomInfo + newString,
       });
       this.zoomData = currentData;
       this.inputZoomId = this.inputZoomName = this.inputZoomInfo = null;
@@ -327,6 +336,24 @@ export default {
         }
       });
       this.zoomData = currentData;
+    },
+    handleAddEdit(){
+      if(this.validateData()){ if (!this.editMode) {     this.addZoomData();    } else {   this.editZoomDataDiag();  }     this.addDialog = false;  this.clearZoomDataDialog();  }else{alert("something went wrong")}
+    },
+    validateData(){
+      var meetingIdStr = this.inputZoomId + ""
+      if(meetingIdStr.length >=9 && !isNaN(meetingIdStr))
+      {
+        return true;
+      }
+      //return false if not, return true if it is
+
+      //this.inputZoomName = zoomData.class;
+      // this.inputZoomId = zoomData.meetingID;
+      // this.inputZoomInfo = zoomData.info;
+      //this.inputZoomId + this.inputZoomName + this.inputZoomInfo //key
+
+      return false
     },
     openSettings() {
       browser.runtime.openOptionsPage();
