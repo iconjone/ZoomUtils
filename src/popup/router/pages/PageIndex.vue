@@ -2,7 +2,13 @@
   <v-app id="popup">
     <v-navigation-drawer v-model="drawer" app right>
       <v-list>
-        <v-list-item @click="addDialog = true">
+        <v-list-item
+          @click="
+            addDialog = true;
+            drawer = false;
+          "
+          :disabled="deleteMode || editMode"
+        >
           <v-list-item-action>
             <v-icon>mdi-plus</v-icon>
           </v-list-item-action>
@@ -10,7 +16,14 @@
             <v-list-item-title>Add</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item link>
+        <v-list-item
+          active
+          @click="
+            deleteMode = !deleteMode;
+            drawer = false;
+          "
+          :disabled="editMode"
+        >
           <v-list-item-action>
             <v-icon>mdi-delete</v-icon>
           </v-list-item-action>
@@ -18,12 +31,18 @@
             <v-list-item-title>Delete</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item link>
+        <v-list-item
+          @click="
+            editMode = !editMode;
+            drawer = false;
+          "
+          :disabled="deleteMode"
+        >
           <v-list-item-action>
-            <v-icon>mdi-email</v-icon>
+            <v-icon>mdi-pencil</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>Contact</v-list-item-title>
+            <v-list-item-title>Edit</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-list-item>
@@ -47,7 +66,9 @@
       </v-tooltip>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
-          <v-app-bar-nav-icon v-bind="attrs" v-on="on" short="true" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+          <v-badge color="secondary" :value="modeIcon" :icon="modeIcon" offset-x="20" offset-y="20">
+            <v-app-bar-nav-icon v-bind="attrs" v-on="on" short="true" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+          </v-badge>
         </template>
         <span>Menu</span>
       </v-tooltip>
@@ -87,20 +108,40 @@
         <draggable v-model="zoomData" v-bind="dragOptions" @start="drag = true" @end="drag = false">
           <transition-group type="transition" :name="!drag ? 'flip-list' : null">
             <v-expansion-panel v-for="element in zoomData" :key="element.key">
+              <v-overlay :value="deleteMode" absolute="absolute" opacity=".5">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn icon @click="deleteZoomData(element)" v-bind="attrs" v-on="on">
+                      <v-icon large>mdi-delete</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Delete {{ element.class }}</span>
+                </v-tooltip>
+              </v-overlay>
+              <v-overlay :value="editMode" absolute="absolute" opacity=".5">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn icon @click="editZoomData(element)" v-bind="attrs" v-on="on">
+                      <v-icon large>mdi-pencil</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Edit {{ element.class }}</span>
+                </v-tooltip>
+              </v-overlay>
               <v-expansion-panel-header class="max-width">
                 <v-row>
-                  <v-col cols="3">
+                  <v-col cols="2" class="center-list text-center">
                     {{ element.class }}
                   </v-col>
-                  <v-col style="padding:0px">
-                    <v-btn target="blank" :href="generateZoomLink(element)" class="mx-4" style="width:80%" color="secondary">{{ element.meetingID }}</v-btn>
+                  <v-col style="ps-4" cols="4">
+                    <v-btn target="blank" :href="generateZoomLink(element)" class="mx-4" style="width:100%" color="secondary">{{ element.meetingID }}</v-btn>
                   </v-col>
-                  <v-col cols="5">
+                  <v-col style="pl-4" class="center-list text-center">
                     {{ element.info }}
                   </v-col>
                 </v-row>
               </v-expansion-panel-header>
-              <v-expansion-panel-content> {{ element.info }}{{ element.key }} </v-expansion-panel-content>
+              <v-expansion-panel-content> {{ element.info }}</v-expansion-panel-content>
             </v-expansion-panel>
           </transition-group>
         </draggable>
@@ -149,13 +190,13 @@
           <v-card-text>
             <v-row>
               <v-col cols="6">
-                <v-text-field label="Zoom Class Name" required></v-text-field>
+                <v-text-field v-model="inputZoomName" label="Zoom Class Name" required></v-text-field>
               </v-col>
               <v-col cols="6">
-                <v-text-field label="Info" required></v-text-field>
+                <v-text-field v-model="inputZoomInfo" label="Info" required></v-text-field>
               </v-col>
               <v-col cols="12">
-                <v-text-field label="Meeting Id" hint="9-11 digit number" type="number"></v-text-field>
+                <v-text-field v-model="inputZoomId" label="Meeting Id" hint="9-11 digit number" type="number"></v-text-field>
               </v-col>
             </v-row>
           </v-card-text>
@@ -163,8 +204,30 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="success" text @click="addDialog = false"> Add </v-btn>
-            <v-btn color="primary" text @click="addDialog = false"> Cancel </v-btn>
+            <v-btn
+              color="success"
+              text
+              @click="
+                if (!editMode) {
+                  addZoomData();
+                } else {
+                  editZoomDataDiag();
+                }
+                addDialog = false;
+              "
+            >
+              {{ editModeText }}
+            </v-btn>
+            <v-btn
+              color="primary"
+              text
+              @click="
+                clearZoomDataDialog();
+                addDialog = false;
+              "
+            >
+              Cancel
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -179,7 +242,18 @@ import { mapActions } from 'vuex';
 
 export default {
   data() {
-    return { drawer: null, drag: false, infoDialog: false, addDialog: false };
+    return {
+      drawer: null,
+      drag: false,
+      infoDialog: false,
+      addDialog: false,
+      inputZoomName: null,
+      inputZoomId: null,
+      inputZoomInfo: null,
+      deleteMode: false,
+      editMode: false,
+      editKey: null,
+    };
   },
   components: {
     draggable,
@@ -188,6 +262,53 @@ export default {
     ...mapActions(['setZoomData'], ['setDarkMode']),
     generateZoomLink(zoomData) {
       return 'zoommtg://jonathan.zoom.us/join?action=join&amp;confno=' + zoomData.meetingID;
+    },
+    clearZoomDataDialog() {
+      this.inputZoomId = this.inputZoomName = this.inputZoomInfo = null;
+    },
+    addZoomData() {
+      var currentData = this.zoomData;
+      currentData.push({
+        class: this.inputZoomName,
+        meetingID: this.inputZoomId,
+        info: this.inputZoomInfo,
+        key: this.inputZoomId + this.inputZoomName + this.inputZoomInfo,
+      });
+      this.zoomData = currentData;
+      this.inputZoomId = this.inputZoomName = this.inputZoomInfo = null;
+    },
+    deleteZoomData(zoomData) {
+      var key = zoomData.key;
+      var currentData = this.zoomData;
+      this.zoomData = currentData.filter(data => data.key != key);
+    },
+    editZoomData(zoomData) {
+      this.editKey = zoomData.key;
+      this.inputZoomName = zoomData.class;
+      this.inputZoomId = zoomData.meetingID;
+      this.inputZoomInfo = zoomData.info;
+      this.addDialog = true;
+    },
+    editZoomDataDiag() {
+      var vueApp = this;
+      var currentData = this.zoomData;
+      currentData.forEach(data => {
+        if (vueApp.editKey == data.key) {
+          data.class = vueApp.inputZoomName;
+          data.info = vueApp.inputZoomInfo;
+          data.meetingID = vueApp.inputZoomId;
+          data.key = vueApp.inputZoomId + vueApp.inputZoomName + vueApp.inputZoomInfo;
+        }
+      });
+      this.zoomData = currentData;
+    },
+    parseLinks(link) {
+      var link;
+
+      console.log(link);
+      // print() = console.log()
+
+      return false;
     },
 
     // sendNotification(title, message)
@@ -216,6 +337,15 @@ export default {
         ghostClass: 'ghost',
       };
     },
+    modeIcon() {
+      if (this.deleteMode) return 'mdi-delete';
+      if (this.editMode) return 'mdi-pencil';
+      return 0;
+    },
+    editModeText() {
+      if (this.editMode) return 'SAVE';
+      return 'ADD';
+    },
   },
   created() {
     console.log(this, 'created');
@@ -233,7 +363,11 @@ p {
   font-size: 20px;
 }
 .max-width {
-  width: 500px !important;
+  width: 600px !important;
+}
+.center-list {
+  margin-top: auto;
+  margin-bottom: auto;
 }
 .ghost {
   opacity: 0.5;

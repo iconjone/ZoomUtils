@@ -67,7 +67,7 @@ browser.runtime.onInstalled.addListener(function(details) {
         // Process old data and add any needed information.
         var zoomData = JSON.parse(data.zoomData);
         zoomData.forEach((item, i) => {
-          zoomData[i].key = i;
+          zoomData[i].key = item.meetingID + item.class + item.info; // make the key id+name+info
         });
         var promise = browser.storage.sync.set({ zoomData: zoomData });
         console.log(promise);
