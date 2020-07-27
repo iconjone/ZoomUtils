@@ -172,7 +172,7 @@
                     </v-tooltip>
                   </v-col>
                   <v-col>
-                    <v-switch v-model="element.notification" label="Notifications"></v-switch>
+                    <v-switch label="Notifications" v-model="element.notification" v-on:click.stop="handleNotificationToggle(element)"></v-switch>
                   </v-col>
                 </v-row>
               </v-expansion-panel-content>
@@ -366,12 +366,6 @@ export default {
       if (meetingIdStr.length >= 9 && !isNaN(meetingIdStr)) {
         return true;
       }
-      // return false if not, return true if it is
-
-      // this.inputZoomName = zoomData.class;
-      // this.inputZoomId = zoomData.meetingID;
-      // this.inputZoomInfo = zoomData.info;
-      // this.inputZoomId + this.inputZoomName + this.inputZoomInfo //key
 
       return false;
     },
@@ -405,6 +399,17 @@ export default {
           customAlert('Could not find any Zoom Links :(');
         }
       });
+    },
+    handleNotificationToggle(element) {
+      element.notification = !element.notification;
+      var vueApp = this;
+      var currentData = this.zoomData;
+      currentData.forEach(data => {
+        if (element.key == data.key) {
+          data.notification = element.notification;
+        }
+      });
+      this.zoomData = currentData;
     },
 
     // sendNotification(title, message)
@@ -462,6 +467,9 @@ export default {
   watch: {
     isDark() {
       this.$vuetify.theme.dark = this.isDark;
+    },
+    zoomData() {
+      console.log('detected change');
     },
   },
 };

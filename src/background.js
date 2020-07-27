@@ -40,9 +40,9 @@ browser.runtime.onInstalled.addListener(function(details) {
     browser.storage.sync
       .set({
         zoomData: [
-          { class: 'ESET 210', meetingID: '12345678', info: 'Click on the info Icon!', key: 1 },
-          { class: 'CSCE 222', meetingID: '123456789', info: 'HELL MW 10:20 AM', key: 2 },
-          { class: 'PHYS 207', meetingID: '12345679', info: 'TA SESSION 3:00 PM', key: 3 },
+          { class: 'ESET 210', meetingID: '12345678', info: 'Click on the info Icon!', key: 1, notification: false },
+          { class: 'CSCE 222', meetingID: '123456789', info: 'HELL MW 10:20 AM', key: 2, notification: false },
+          { class: 'PHYS 207', meetingID: '12345679', info: 'TA SESSION 3:00 PM', key: 3, notification: false },
         ],
       })
       .then(promise => {
@@ -68,6 +68,7 @@ browser.runtime.onInstalled.addListener(function(details) {
         var zoomData = JSON.parse(data.zoomData);
         zoomData.forEach((item, i) => {
           zoomData[i].key = item.meetingID + item.class + item.info; // make the key id+name+info
+          zoomData[i].notification = false;
         });
         var promise = browser.storage.sync.set({ zoomData: zoomData });
         console.log(promise);
