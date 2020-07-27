@@ -210,15 +210,12 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <v-dialog v-model="addDialog" width="500">
+      <v-dialog v-model="addDialog" persistent width="500">
         <v-card>
           <v-card-title>
-            Add
+            {{ editModeText }} Zoom Meeting <v-spacer> </v-spacer>Password
+            <v-checkbox v-model="showPasswordCheckBox"></v-checkbox>
           </v-card-title>
-          <v-card-subtitle>
-            text
-          </v-card-subtitle>
-
           <v-card-text>
             <v-row>
               <v-col cols="6">
@@ -229,6 +226,17 @@
               </v-col>
               <v-col cols="12">
                 <v-text-field v-model="inputZoomId" label="Meeting Id" hint="9-11 digit number" type="number"></v-text-field>
+              </v-col>
+              <v-col v-if="showPasswordCheckBox" cols="12">
+                <v-text-field
+                  v-model="inputZoomPassword"
+                  label="Meeting Password"
+                  hint="Meeting Password"
+                  :append-icon="showMeetingPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                  :type="showMeetingPassword ? 'text' : 'password'"
+                  counter
+                  @click:append="showMeetingPassword = !showMeetingPassword"
+                ></v-text-field>
               </v-col>
             </v-row>
           </v-card-text>
@@ -281,12 +289,15 @@ export default {
       inputZoomName: null,
       inputZoomId: null,
       inputZoomInfo: null,
+      inputZoomPassword: null,
       deleteMode: false,
       editMode: false,
       editKey: null,
       zoomLinkFound: false,
       alert: false,
       alertText: 'No Message',
+      showPasswordCheckBox: false,
+      showMeetingPassword: false,
     };
   },
   components: {
@@ -307,7 +318,8 @@ export default {
       this.alert = true;
     },
     clearZoomDataDialog() {
-      this.inputZoomId = this.inputZoomName = this.inputZoomInfo = null;
+      this.inputZoomId = this.inputZoomName = this.inputZoomInfo = this.inputZoomPassword = null;
+      this.showPasswordCheckBox = false;
     },
     addZoomData() {
       var currentData = this.zoomData;
@@ -323,6 +335,7 @@ export default {
         meetingID: this.inputZoomId,
         info: this.inputZoomInfo,
         key: this.inputZoomId + this.inputZoomName + this.inputZoomInfo + newString,
+        password: this.inputZoomPassword,
       });
       this.zoomData = currentData;
       this.inputZoomId = this.inputZoomName = this.inputZoomInfo = null;
@@ -337,6 +350,12 @@ export default {
       this.inputZoomName = zoomData.class;
       this.inputZoomId = zoomData.meetingID;
       this.inputZoomInfo = zoomData.info;
+      this.inputZoomPassword = zoomData.password;
+      if (zoomData.password != '' && zoomData.password != undefined) {
+        this.showPasswordCheckBox = true;
+      } else {
+        this.showPasswordCheckBox = false;
+      }
       this.addDialog = true;
     },
     editZoomDataDiag() {
@@ -398,6 +417,10 @@ export default {
         if (linksFound.length > 0) {
           var link = linksFound[0];
           this.inputZoomId = link.match('\\d\\d\\d\\d\\d\\d\\d\\d\\d+')[0];
+          this.inputZoomPassword = new URL(link).searchParams.get('pwd');
+          if (this.inputZoomPassword != null) {
+            this.showPasswordCheckBox = true;
+          }
           this.addDialog = true;
         } else {
           customAlert('Could not find any Zoom Links :(');
@@ -448,8 +471,8 @@ export default {
       return 0;
     },
     editModeText() {
-      if (this.editMode) return 'SAVE';
-      return 'ADD';
+      if (this.editMode) return 'Save';
+      return 'Add';
     },
   },
   created() {
