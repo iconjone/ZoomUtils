@@ -296,6 +296,10 @@ export default {
   methods: {
     ...mapActions(['setZoomData'], ['setDarkMode']),
     generateZoomLink(zoomData) {
+      /// / TODO: make this neater and smarter
+      if (zoomData.password != '' && zoomData.password != undefined) {
+        return 'zoommtg://jonathan.zoom.us/join?action=join&confno=' + zoomData.meetingID + '&pwd=' + zoomData.password;
+      }
       return 'zoommtg://jonathan.zoom.us/join?action=join&confno=' + zoomData.meetingID;
     },
     customAlert(msg) {
