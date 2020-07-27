@@ -10,18 +10,23 @@ import '../fonts/Roboto/font_roboto.css';
 Vue.use(Vuetify);
 const vuetify = new Vuetify({
   theme: {
+    options: {
+      customProperties: true,
+    },
     themes: {
       light: {
         primary: '#002f57',
         secondary: '#adb5bd',
-        accent: '#38f527',
+        accent: '#db6f02',
         error: '#b71c1c',
+        success: '#27b81a',
       },
       dark: {
         primary: '#002f57',
         secondary: '#adb5bd',
-        accent: '#38f527',
+        accent: '#db6f02',
         error: '#b71c1c',
+        success: '#27b81a',
       },
     },
   },

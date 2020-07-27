@@ -248,7 +248,7 @@
               {{ editModeText }}
             </v-btn>
             <v-btn
-              color="primary"
+              color="error"
               text
               @click="
                 clearZoomDataDialog();
@@ -329,6 +329,9 @@ export default {
           newString += 'keyAdd';
         }
       });
+      if (!this.showPasswordCheckBox) {
+        this.inputZoomPassword = null;
+      }
 
       currentData.push({
         class: this.inputZoomName,
@@ -361,12 +364,16 @@ export default {
     editZoomDataDiag() {
       var vueApp = this;
       var currentData = this.zoomData;
+      if (!this.showPasswordCheckBox) {
+        this.inputZoomPassword = null;
+      }
       currentData.forEach(data => {
         if (vueApp.editKey == data.key) {
           data.class = vueApp.inputZoomName;
           data.info = vueApp.inputZoomInfo;
           data.meetingID = vueApp.inputZoomId;
           data.key = vueApp.inputZoomId + vueApp.inputZoomName + vueApp.inputZoomInfo;
+          data.password = vueApp.inputZoomPassword;
         }
       });
       this.zoomData = currentData;
@@ -523,24 +530,5 @@ p {
 }
 .no-move {
   transition: transform 0s;
-}
-
-::-webkit-scrollbar {
-  width: 15px;
-}
-
-::-webkit-scrollbar-track {
-  background: #202020;
-  border-left: 1px solid #2c2c2c;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #3e3e3e;
-  border: solid 3px #202020;
-  border-radius: 7px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: white;
 }
 </style>
