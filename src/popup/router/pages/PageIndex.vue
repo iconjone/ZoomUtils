@@ -152,7 +152,13 @@
                     {{ element.class }}
                   </v-col>
                   <v-col class="ps-4" cols="4">
-                    <v-btn target="blank" :href="generateZoomLink(element)" class="mx-4" style="width:100%; " color="primary">{{ element.meetingID }}</v-btn>
+                          <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                              <v-btn target="blank" :href="generateZoomLink(element)" class="mx-4" style="width:100%; " color="primary" v-bind="attrs" v-on="on">{{ element.meetingID }} </v-btn>
+                          </template>
+                  <span>Join Now</span>
+                </v-tooltip>
+                   
                   </v-col>
                   <v-col class=" pl-4 center-list text-center">
                     {{ element.info }}
@@ -445,6 +451,7 @@ export default {
       });
       this.zoomData = currentData;
     },
+
 
     // sendNotification(title, message)
   },
