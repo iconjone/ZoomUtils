@@ -169,6 +169,7 @@
               <v-expansion-panel-content>
                 <v-row>
                   <v-col class="center-list text-center">
+                    {{ scheduleTextArrayBuilder(element.scheduleData) }}
                     <v-tooltip bottom>
                       <template v-slot:activator="{ on, attrs }">
                         <v-btn icon @click="handleScheduleClick(element)" v-bind="attrs" v-on="on">
@@ -267,7 +268,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <v-dialog v-model="scheduleDialog" width="500">
+      <v-dialog v-model="scheduleDialog" width="500" persistent>
         <v-card>
           <v-card-title>
             Schedule
@@ -275,7 +276,7 @@
             <v-btn @click="addEmptySchedule()">Add Meeting Time</v-btn>
           </v-card-title>
 
-          <v-data-iterator :items="scheduleData" disable-pagination hide-default-footer no-data-text="no shecdule exists yet">
+          <v-data-iterator :items="scheduleData" disable-pagination hide-default-footer no-data-text="No Meeting Times Set">
             <template v-slot:default="props">
               <v-container>
                 <v-row>
@@ -311,7 +312,7 @@
                         </v-dialog>
                       </v-col>
                       <v-col style="padding: 4px;">
-                        <v-btn icon style=" margin-top: 16px;">
+                        <v-btn icon style=" margin-top: 16px;" @click="handleScheduleDelete(item)">
                           <v-icon color="secondary">mdi-close</v-icon>
                         </v-btn>
                       </v-col>
@@ -334,7 +335,6 @@
               text
               @click="
                 handleScheduleSave();
-
                 scheduleDialog = false;
               "
             >
@@ -384,7 +384,7 @@ export default {
       showMeetingPassword: false,
       daysIcons: ['mdi-alpha-s-circle', 'mdi-alpha-m-circle', 'mdi-alpha-t-circle', 'mdi-alpha-w-circle', 'mdi-alpha-t-circle', 'mdi-alpha-f-circle', 'mdi-alpha-s-circle'],
       daysText: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-      daysLetter: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+      daysLetter: ['S', 'M', 'T', 'W', 'Th', 'F', 'S'],
       timeDialog: false,
       time: null,
     };
@@ -481,7 +481,6 @@ export default {
       }
     },
     handleScheduleClick(element) {
-      console.log(element);
       this.editKey = element.key;
       this.scheduleDialog = true;
       // this.$store.dispatch('setScheduleData', [
@@ -493,35 +492,37 @@ export default {
       //  this.scheduleData = ;
     },
     handleScheduleSave() {
-      console.log("get's here", this.scheduleData);
       var vueApp = this;
-      console.log(
-        this.scheduleData.map(data => {
-          data.key = vueApp.scheduleText(data.days, data.time);
-          return data;
-        })
-      );
 
-      // this.scheduleData.forEach((item, i) => {
-      //   console.log()
-      //   vueApp.scheduleData[i].key = vueApp.scheduleText(vueApp.scheduleData[i].days, vueApp.scheduleData[i].time);
-      // });
+      var currentScheduleData = this.scheduleData;
+
+      currentScheduleData.forEach((item, i) => {
+        currentScheduleData[i].key = vueApp.generateScheduleKey(item.days, item.time);
+      });
+
+      // this.$store.dispatch('setScheduleData', currentScheduleData);
 
       var currentData = this.zoomData;
-      // console.log(this.scheduleData, scheduleData, currentData, 'this is what we"re lookign for');
+
       currentData.forEach(data => {
         if (vueApp.editKey == data.key) {
-          data.scheduleData = this.scheduleData;
+          data.scheduleData = currentScheduleData;
         }
       });
       this.zoomData = currentData;
       // save data into zoomdata and dispatch
       // trigger background to update and create alarms/notification fun
-      this.$store.dispatch('setScheduleData', undefined);
+    },
+    handleScheduleDelete(item) {
+      this.handleScheduleSave();
+      var currentScheduleData = [];
+      this.scheduleData.forEach((data, i) => {
+        if (data.key != item.key) currentScheduleData.push(data);
+      });
+      this.$store.dispatch('setScheduleData', currentScheduleData);
     },
     addEmptySchedule() {
       var currentScheduleData = this.scheduleData;
-      console.log(currentScheduleData);
       if (currentScheduleData != undefined) {
         currentScheduleData.push({ days: [false, false, false, false, false, false, false], time: '8:00', key: 'None-8:00 AM' });
       } else {
@@ -551,6 +552,29 @@ export default {
 
       return daysText + ' - ' + timeSplit[0] + ':' + timeSplit[1] + ' ' + mer;
     },
+    scheduleTextArrayBuilder(arr) {
+      if (arr == undefined || arr.length == 0) return '';
+      arr = arr.map(element => {
+        return this.scheduleText(element.days, element.time);
+      });
+      return arr.join(',');
+    },
+    generateScheduleKey(days, time) {
+      var daysText = '';
+      days.forEach((item, i) => {
+        if (item) daysText += this.daysText[i];
+      });
+      var mer = 'AM';
+      var timeSplit = time.split(':');
+
+      if (timeSplit[0] > 12) {
+        mer = 'PM';
+        timeSplit[0] -= 12;
+      }
+      if (daysText == '') daysText = 'None';
+
+      return daysText + ' - ' + timeSplit[0] + ':' + timeSplit[1] + ' ' + mer;
+    },
     validateData() {
       var meetingIdStr = this.inputZoomId + '';
       if (meetingIdStr.length >= 9 && !isNaN(meetingIdStr)) {
@@ -564,7 +588,6 @@ export default {
     },
     getLinks() {
       browser.tabs.executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' }).then(results => {
-        console.log(results[0]);
         return results[0];
       });
     },
@@ -574,7 +597,8 @@ export default {
         var links = results[0];
         var linksFound = [];
         links.forEach((link, i) => {
-          if (link.includes('zoom.us')) {   //.us suffix should guarantee it's a zoomie
+          if (link.includes('zoom.us')) {
+            // .us suffix should guarantee it's a zoomie
             // do some magic to determine if is zoom link
             if (link.search('zoom\.us\/[a-z]{1,2}\/[^\/]+$') != -1) {
               linksFound.push(link);
@@ -654,10 +678,11 @@ export default {
 
     browser.tabs.executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' }).then(results => {
       results[0].forEach((item, i) => {
-        if (item.includes('zoom.us')) {   //.us suffix should guarantee it's a zoomie
+        if (item.includes('zoom.us')) {
+          // .us suffix should guarantee it's a zoomie
           // do some magic to determine if is zoom link
-          if (item.search('zoom\.us\/[a-z]{1,2}\/[^\/]+$') != -1) {   //new regex
-            console.log('found');
+          if (item.search('zoom\.us\/[a-z]{1,2}\/[^\/]+$') != -1) {
+            // new regex
             this.zoomLinkFound = true;
           }
         }
