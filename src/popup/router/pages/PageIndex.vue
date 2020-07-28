@@ -574,16 +574,16 @@ export default {
         var links = results[0];
         var linksFound = [];
         links.forEach((link, i) => {
-          if (link.includes('zoom')) {
+          if (link.includes('zoom.us')) {   //.us suffix should guarantee it's a zoomie
             // do some magic to determine if is zoom link
-            if (link.search('/[a-z]/\\d\\d\\d\\d\\d\\d\\d\\d\\d+') != -1) {
+            if (link.search('zoom\.us\/[a-z]{1,2}\/[^\/]+$') != -1) {
               linksFound.push(link);
             }
           }
         });
         if (linksFound.length > 0) {
           var link = linksFound[0];
-          this.inputZoomId = link.match('\\d\\d\\d\\d\\d\\d\\d\\d\\d+')[0];
+          this.inputZoomId = link.match('[0-9]{9,}')[0];
           this.inputZoomPassword = new URL(link).searchParams.get('pwd');
           if (this.inputZoomPassword != null) {
             this.showPasswordCheckBox = true;
@@ -654,9 +654,9 @@ export default {
 
     browser.tabs.executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' }).then(results => {
       results[0].forEach((item, i) => {
-        if (item.includes('zoom')) {
+        if (item.includes('zoom.us')) {   //.us suffix should guarantee it's a zoomie
           // do some magic to determine if is zoom link
-          if (item.search('/[a-z]/\\d\\d\\d\\d\\d\\d\\d\\d\\d+') != -1) {
+          if (item.search('zoom\.us\/[a-z]{1,2}\/[^\/]+$') != -1) {   //new regex
             console.log('found');
             this.zoomLinkFound = true;
           }
