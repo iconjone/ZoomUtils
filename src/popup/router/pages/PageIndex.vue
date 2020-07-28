@@ -170,7 +170,7 @@
                   <v-col class="center-list text-center">
                     <v-tooltip bottom>
                       <template v-slot:activator="{ on, attrs }">
-                        <v-btn icon @click="editZoomData(element)" v-bind="attrs" v-on="on">
+                        <v-btn icon @click="handleScheduleClick(element)" v-bind="attrs" v-on="on">
                           <v-icon>mdi-calendar</v-icon>
                         </v-btn>
                       </template>
@@ -266,6 +266,83 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <v-dialog v-model="scheduleDialog" width="500">
+        <v-card>
+          <v-card-title>
+            Schedule
+          </v-card-title>
+          <v-card-subtitle>
+            Concerning the blah blah
+          </v-card-subtitle>
+          <v-dialog
+                ref="dialog"
+                v-model="timeDialog"
+                :return-value.sync="time"
+                persistent
+                width="290px"
+              >
+                <v-time-picker
+                  v-if="timeDialog"
+                  v-model="time"
+                  full-width
+                  style="height:425px"
+                >
+                  <v-spacer></v-spacer>
+                  <v-btn text color="primary" @click="timeDialog = false">Cancel</v-btn>
+                  <v-btn text color="primary" @click="$refs.dialog.save(time)">OK</v-btn>
+                </v-time-picker>
+              </v-dialog>
+          <v-card-text>
+            time schedule"
+          </v-card-text>
+          <v-data-iterator :items="scheduleData" disable-pagination hide-default-footer no-data-text="no shecdule exists yet">
+            <template v-slot:default="props">
+              {{props.items}}
+              <v-container fluid>
+        <v-row>
+          <v-col
+            v-for="(item,index) in props.items"
+            :key="index"
+            cols="12"
+          >
+          {{item}}{{index}}{{item.days}}
+        <v-row>
+<v-col v-for="(day,dayIndex) in item.days" :key="index">
+  {{day}}
+  <v-checkbox :off-icon="daysIcons[dayIndex]+'-outline'" :on-icon="daysIcons[dayIndex]" v-model="item.days[dayIndex]">
+
+  </v-checkbox>
+</v-col>
+
+              <!-- <v-checkbox v-for"day in item.days" checkboxOn="mdi-delete" checkboxOff="mdi-pencil" checkboxIndeterminate="mdi-fire" label="Do this?" v-model="day">
+              </v-checkbox> -->
+          </v-row>
+
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+              v-model="time"
+              label="Picker in dialog"
+              prepend-icon="access_time"
+              readonly
+              v-bind="attrs"
+              v-on="on"
+            ></v-text-field>
+          </template>
+        </v-col>
+      </v-row>
+        </v-container>
+
+</template>
+          </v-data-iterator>
+
+          <v-divider></v-divider>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" text @click="scheduleDialog = false"> Close </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
       <v-snackbar v-model="alert" :multi-line="true">
         {{ alertText }}
 
@@ -292,6 +369,7 @@ export default {
       drag: false,
       infoDialog: false,
       addDialog: false,
+      scheduleDialog: false,
       inputZoomName: null,
       inputZoomId: null,
       inputZoomInfo: null,
@@ -304,6 +382,10 @@ export default {
       alertText: 'No Message',
       showPasswordCheckBox: false,
       showMeetingPassword: false,
+      scheduleData: [],
+      daysIcons: ["mdi-alpha-s-circle","mdi-alpha-m-circle","mdi-alpha-t-circle","mdi-alpha-w-circle","mdi-alpha-t-circle","mdi-alpha-f-circle","mdi-alpha-s-circle"],
+      timeDialog:false,
+      time:null
     };
   },
   components: {
@@ -394,8 +476,14 @@ export default {
         this.addDialog = false;
         this.clearZoomDataDialog();
       } else {
-        this.customAlert('something went wrong');
+        this.customAlert('Something went wrong. Check the Meeting ID');
       }
+    },
+    handleScheduleClick(element){
+      console.log(element)
+      this.scheduleDialog= true
+      //this.scheduleData = element.scheduleData
+      this.scheduleData = [{days:[false,true,false,true,false,false,false], time:"01:29 PM"}, {days:[true,true,true,true,false,false,false], time:"01:29 PM"}]
     },
     validateData() {
       var meetingIdStr = this.inputZoomId + '';
