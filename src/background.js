@@ -100,9 +100,9 @@ function initStore() {
 browser.tabs.onActivated.addListener(listener => {
   browser.tabs.executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' }).then(results => {
     results[0].forEach((item, i) => {
-      if (item.includes('zoom')) {
+      if (item.includes('zoom.us')) {   //.us suffix should guarantee it's a zoomie
         // do some magic to determine if is zoom link
-        if (item.search('/[a-z]/\\d\\d\\d\\d\\d\\d\\d\\d\\d+') != -1) {
+        if (item.search('zoom\.us\/[a-z]{1,2}\/[^\/]+$') != -1) {   //new regex
           browser.browserAction.setBadgeText({ text: 'ADD', tabId: listener.tabId });
         }
       }
