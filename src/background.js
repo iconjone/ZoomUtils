@@ -112,6 +112,18 @@ browser.tabs.onActivated.addListener(listener => {
   });
 });
 
+// console.log("creating alarm")
+// console.log(browser)
+// browser.alarms.create(
+//   "test",              // optional string
+//   {when: Date.now(), periodInMinutes:1}          // optional object
+// )
+//
+// browser.alarms.onAlarm.addListener(alarm=>{
+//   console.log(alarm)
+//   chrome.notifications.create("", {iconUrl:"icons/icon_128.png", type:"basic", title:"test", message:"what's up hello test"})
+// })
+
 // https://stackoverflow.com/questions/56815002/store-data-from-background-js-into-the-vuex-store
 /// / TODO: We need to figure out how to use this npm package to pass data from stores.
 
