@@ -9,5 +9,8 @@ export default {
   },
   [types.UPDATE_DARK_MODE](state, payload) {
     state.darkmode = payload;
-  }
+  },
+  [types.UPDATE_SCHEDULE_DATA](state, payload) {
+    state.scheduleData = payload;
+  },
 };

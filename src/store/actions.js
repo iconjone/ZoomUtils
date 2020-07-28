@@ -22,3 +22,6 @@ export const initDarkMode = ({ commit }, payload) => {
   console.log('Committing darkModeData');
   commit(types.UPDATE_DARK_MODE, payload);
 };
+export const setScheduleData = ({ commit }, payload) => {
+  commit(types.UPDATE_SCHEDULE_DATA, payload);
+};
