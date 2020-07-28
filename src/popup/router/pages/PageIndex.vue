@@ -574,9 +574,9 @@ export default {
         var links = results[0];
         var linksFound = [];
         links.forEach((link, i) => {
-          if (link.includes('zoom.us')) {   //.us suffix should guarantee it's a zoomie
+          if (item.includes('zoom.us/j/') || item.includes('zoom.us/w/') || item.includes('zoom.us/wc/')) {   //.us suffix + valid filler should guarantee it's a zoomie
             // do some magic to determine if is zoom link
-            if (link.search('zoom\.us\/[a-z]{1,2}\/[^\/]+$') != -1) {
+            if (link.search('[0-9]{9,}') != -1) {   //passing the extraction test means there is an ID to be extracted
               linksFound.push(link);
             }
           }
@@ -654,9 +654,9 @@ export default {
 
     browser.tabs.executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' }).then(results => {
       results[0].forEach((item, i) => {
-        if (item.includes('zoom.us')) {   //.us suffix should guarantee it's a zoomie
+        if (item.includes('zoom.us/j/') || item.includes('zoom.us/w/') || item.includes('zoom.us/wc/')) {   //.us suffix + valid filler should guarantee it's a zoomie
           // do some magic to determine if is zoom link
-          if (item.search('zoom\.us\/[a-z]{1,2}\/[^\/]+$') != -1) {   //new regex
+          if (item.search('[0-9]{9,}') != -1) {   //passing the extraction test means there is an ID to be extracted
             console.log('found');
             this.zoomLinkFound = true;
           }
