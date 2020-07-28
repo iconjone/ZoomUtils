@@ -388,7 +388,7 @@ export default {
         this.addDialog = false;
         this.clearZoomDataDialog();
       } else {
-        this.customAlert('something went wrong');
+        this.customAlert('Something went wrong. Check the Meeting ID');
       }
     },
     validateData() {
