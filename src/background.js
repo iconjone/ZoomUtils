@@ -133,26 +133,27 @@ browser.tabs.onActivated.addListener(listener => {
 function createNotificationHandler() {
   browser.alarms.clearAll();
   var zoomData = store.state.zoomData;
-  zoomData.forEach((zoom, z) => {
-    if (zoom.scheduleData != undefined)
-      zoom.scheduleData.forEach((schedule, s) => {
-        schedule.days.forEach((day, d) => {
-          if (zoom.notification && day) {
-            if (store.state.reminder != [] && store.state.reminder != undefined);
-            store.state.reminder.forEach((item, i) => {
+  if (zoomData != undefined)
+    zoomData.forEach((zoom, z) => {
+      if (zoom.scheduleData != undefined)
+        zoom.scheduleData.forEach((schedule, s) => {
+          schedule.days.forEach((day, d) => {
+            if (zoom.notification && day) {
+              if (store.state.reminder != [] && store.state.reminder != undefined);
+              store.state.reminder.forEach((item, i) => {
+                browser.alarms.create(
+                  JSON.stringify({ data: zoom, timeDelay: item }), // optional string with more data
+                  { when: findClosestFutureTime(d, schedule.time, item), periodInMinutes: 10080 } // optional object
+                );
+              });
               browser.alarms.create(
-                JSON.stringify({ data: zoom, timeDelay: item }), // optional string with more data
-                { when: findClosestFutureTime(d, schedule.time, item), periodInMinutes: 10080 } // optional object
+                JSON.stringify({ data: zoom, timeDelay: 0 }), // optional string with more data
+                { when: findClosestFutureTime(d, schedule.time, 0), periodInMinutes: 10080 } // optional object
               );
-            });
-            browser.alarms.create(
-              JSON.stringify({ data: zoom, timeDelay: 0 }), // optional string with more data
-              { when: findClosestFutureTime(d, schedule.time, 0), periodInMinutes: 10080 } // optional object
-            );
-          }
+            }
+          });
         });
-      });
-  });
+    });
 }
 
 function findClosestFutureTime(dayIndex, time, delay) {
