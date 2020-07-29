@@ -2,7 +2,7 @@
   "name": "zoomutils",
   "version": "2.0.0",
   "private": true,
-  "description": "Zoom Utils",
+  "description": "Zoom Utils for Zoom University Students",
   "author": "Jonathan Samuel",
   "scripts": {
     "serve": "vue-cli-service build --mode development --watch",
