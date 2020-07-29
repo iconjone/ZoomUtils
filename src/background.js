@@ -110,11 +110,11 @@ browser.tabs.onActivated.addListener(listener => {
     .executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' })
     .then(results => {
       results[0].forEach((item, i) => {
-        if (item.includes('zoom.us')) {
-          // .us suffix should guarantee it's a zoomie
+        if (item.includes('zoom.us/j/') || item.includes('zoom.us/w/') || item.includes('zoom.us/wc/')) {
+          // .us suffix + valid filler should guarantee it's a zoomie
           // do some magic to determine if is zoom link
-          if (item.search('zoom.us/[a-z]{1,2}/[^/]+$') != -1) {
-            // new regex
+          if (item.search('[0-9]{9,}') != -1) {
+            // passing the extraction test means there is an ID to be extracted
             browser.browserAction.setBadgeText({ text: 'ADD', tabId: listener.tabId });
           }
         }
