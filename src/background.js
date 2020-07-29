@@ -59,10 +59,14 @@ browser.runtime.onInstalled.addListener(function(details) {
       });
       console.log('light Mode');
     }
+    browser.storage.sync.set({ reminder: ['15'], autoJoin: false }).then(data => {
+      console.log('set reminder and auto join');
+    });
+
     initStore();
   } else if (details.reason === 'update') {
     console.log('Updating....');
-    browser.storage.sync.get('zoomData').then(data => {
+    browser.storage.sync.get().then(data => {
       if (typeof data.zoomData === 'string' || data.zoomData instanceof String) {
         // Process old data and add any needed information.
         var zoomData = JSON.parse(data.zoomData);
@@ -74,18 +78,19 @@ browser.runtime.onInstalled.addListener(function(details) {
         console.log(promise);
         console.log('Old string data has been converted to object data');
       }
+      if (data.reminder == undefined)
+        browser.storage.sync.set({ reminder: ['15'] }).then(data => {
+          console.log('set reminder and auto join');
+        });
+      if (data.autoJoin == undefined)
+        browser.storage.sync.set({ autoJoin: false }).then(data => {
+          console.log('set reminder and auto join');
+        });
       initStore();
     });
   }
-  // else{
-  //   initStore()
-  // }
+
   console.log(details);
-  // browser.storage.sync.get('zoomData').then(data => {
-  //   console.log('commiting data', data.zoomData);
-  //   store.dispatch('setZoomData', data.zoomData);
-  //   console.log(store);
-  // });
 });
 initStore();
 // needs to run after above function
@@ -94,23 +99,50 @@ function initStore() {
     console.log(data);
     store.dispatch('initZoomData', data.zoomData);
     store.dispatch('initDarkMode', data.darkmode);
+    store.dispatch('initReminder', data.reminder);
+    store.dispatch('initAutoJoin', data.autoJoin);
+    createNotificationHandler();
   });
 }
 
 browser.tabs.onActivated.addListener(listener => {
-  browser.tabs.executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' }).then(results => {
-    results[0].forEach((item, i) => {
-      if (item.includes('zoom')) {
-        // do some magic to determine if is zoom link
-        if (item.search('/[a-z]/\\d\\d\\d\\d\\d\\d\\d\\d\\d+') != -1) {
-          browser.browserAction.setBadgeText({ text: 'ADD', tabId: listener.tabId });
+  browser.tabs
+    .executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' })
+    .then(results => {
+      results[0].forEach((item, i) => {
+        if (item.includes('zoom.us/j/') || item.includes('zoom.us/w/') || item.includes('zoom.us/wc/')) {
+          // .us suffix + valid filler should guarantee it's a zoomie
+          // do some magic to determine if is zoom link
+          if (item.search('[0-9]{9,}') != -1) {
+            // passing the extraction test means there is an ID to be extracted
+            browser.browserAction.setBadgeText({ text: 'ADD', tabId: listener.tabId });
+          }
         }
+      });
+
+      // return results[0];
+    })
+    .catch(e => {
+      console.log(e);
+    });
+});
+
+function createNotificationHandler() {
+  browser.alarms.clearAll();
+  console.log(store.state.zoomData, 'looking for this');
+  var zoomData = store.state.zoomData;
+  zoomData.forEach((zoom, i) => {
+    zoom.scheduleData.forEach((schedule, i) => {
+      console.log(schedule);
+      if (zoomData.notification) {
+        browser.alarms.create(
+          JSON.stringify(zoom), // optional string with more data
+          { when: Date.now(), periodInMinutes: 10080 } // optional object
+        );
       }
     });
-
-    // return results[0];
   });
-});
+}
 
 // console.log("creating alarm")
 // console.log(browser)
@@ -119,10 +151,10 @@ browser.tabs.onActivated.addListener(listener => {
 //   {when: Date.now(), periodInMinutes:1}          // optional object
 // )
 //
-// browser.alarms.onAlarm.addListener(alarm=>{
-//   console.log(alarm)
-//   chrome.notifications.create("", {iconUrl:"icons/icon_128.png", type:"basic", title:"test", message:"what's up hello test"})
-// })
+browser.alarms.onAlarm.addListener(alarm => {
+  console.log(alarm);
+  chrome.notifications.create('', { iconUrl: 'icons/icon_128.png', type: 'basic', title: 'test', message: "what's up hello test" });
+});
 
 // https://stackoverflow.com/questions/56815002/store-data-from-background-js-into-the-vuex-store
 /// / TODO: We need to figure out how to use this npm package to pass data from stores.

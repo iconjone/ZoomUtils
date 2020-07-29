@@ -13,7 +13,10 @@ export default new Vuex.Store({
   state: {
     foo: 'bar',
     zoomData: [],
-    darkmode: false
+    darkmode: false,
+    scheduleData: [],
+    reminder: [],
+    autoJoin: false,
   },
   getters,
   mutations,

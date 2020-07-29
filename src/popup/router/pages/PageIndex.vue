@@ -64,7 +64,7 @@
           <v-list-item>
             <v-icon>mdi-weather-sunny</v-icon>
             <v-list-item-action>
-              <v-switch v-model="isDark" inset color="primary"></v-switch>
+              <v-switch v-model="isDark" inset color="secondary"></v-switch>
             </v-list-item-action>
             <v-icon class="pl-2">mdi-weather-night</v-icon>
           </v-list-item>
@@ -152,13 +152,14 @@
                     {{ element.class }}
                   </v-col>
                   <v-col class="ps-4" cols="4">
-                          <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                              <v-btn target="blank" :href="generateZoomLink(element)" class="mx-4" style="width:100%; " color="primary" v-bind="attrs" v-on="on">{{ formatMeetingID(element.meetingID) }} </v-btn>
-                          </template>
-                  <span>Join Now</span>
-                </v-tooltip>
-
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn target="blank" :href="generateZoomLink(element)" class="mx-4" style="width:100%; " color="primary" v-bind="attrs" v-on="on"
+                          >{{ element.meetingID }}
+                        </v-btn>
+                      </template>
+                      <span>Join Now</span>
+                    </v-tooltip>
                   </v-col>
                   <v-col class=" pl-4 center-list text-center">
                     {{ element.info }}
@@ -168,6 +169,7 @@
               <v-expansion-panel-content>
                 <v-row>
                   <v-col class="center-list text-center">
+                    {{ scheduleTextArrayBuilder(element.scheduleData) }}
                     <v-tooltip bottom>
                       <template v-slot:activator="{ on, attrs }">
                         <v-btn icon @click="handleScheduleClick(element)" v-bind="attrs" v-on="on">
@@ -212,7 +214,7 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" text @click="infoDialog = false"> Close </v-btn>
+            <v-btn text @click="infoDialog = false"> Close </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -251,7 +253,7 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="success" text @click="handleAddEdit()">
-              {{ editModeText }}
+              {{ saveModeText }}
             </v-btn>
             <v-btn
               color="error"
@@ -266,80 +268,78 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <v-dialog v-model="scheduleDialog" width="500">
+      <v-dialog v-model="scheduleDialog" width="500" persistent>
         <v-card>
           <v-card-title>
             Schedule
+            <v-spacer> </v-spacer>
+            <v-btn @click="addEmptySchedule()">Add Meeting Time</v-btn>
           </v-card-title>
-          <v-card-subtitle>
-            Concerning the blah blah
-          </v-card-subtitle>
-          <v-dialog
-                ref="dialog"
-                v-model="timeDialog"
-                :return-value.sync="time"
-                persistent
-                width="290px"
-              >
-                <v-time-picker
-                  v-if="timeDialog"
-                  v-model="time"
-                  full-width
-                  style="height:425px"
-                >
-                  <v-spacer></v-spacer>
-                  <v-btn text color="primary" @click="timeDialog = false">Cancel</v-btn>
-                  <v-btn text color="primary" @click="$refs.dialog.save(time)">OK</v-btn>
-                </v-time-picker>
-              </v-dialog>
-          <v-card-text>
-            time schedule"
-          </v-card-text>
-          <v-data-iterator :items="scheduleData" disable-pagination hide-default-footer no-data-text="no shecdule exists yet">
+
+          <v-data-iterator :items="scheduleData" disable-pagination hide-default-footer no-data-text="No Meeting Times Set">
             <template v-slot:default="props">
-              {{props.items}}
-              <v-container fluid>
-        <v-row>
-          <v-col
-            v-for="(item,index) in props.items"
-            :key="index"
-            cols="12"
-          >
-          {{item}}{{index}}{{item.days}}
-        <v-row>
-<v-col v-for="(day,dayIndex) in item.days" :key="index">
-  {{day}}
-  <v-checkbox :off-icon="daysIcons[dayIndex]+'-outline'" :on-icon="daysIcons[dayIndex]" v-model="item.days[dayIndex]">
+              <v-container>
+                <v-row>
+                  <v-col v-for="(item, index) in props.items" :key="item.key" cols="12">
+                    <v-row>
+                      <v-col v-for="(day, dayIndex) in item.days" :key="dayIndex" style="padding: 4px;">
+                        <v-checkbox :off-icon="daysIcons[dayIndex] + '-outline'" :on-icon="daysIcons[dayIndex]" v-model="item.days[dayIndex]" color="secondary"> </v-checkbox>
+                      </v-col>
+                      <v-divider vertical></v-divider>
+                      <v-col style="padding: 4px;">
+                        <v-dialog ref="itemdialog" v-model="item.timeDialog" :return-value.sync="item.time" persistent>
+                          <template v-slot:activator="{ on, attrs }">
+                            <!-- <v-text-field v-model="item.time" label="Picker in dialog" prepend-icon="access_time" readonly v-bind="attrs" v-on="on"></v-text-field> -->
+                            <v-btn icon v-bind="attrs" v-on="on" style=" margin-top: 16px; ">
+                              <v-icon>access_time</v-icon>
+                            </v-btn>
+                          </template>
+                          <v-time-picker v-if="item.timeDialog" v-model="item.time" full-width :ampm-in-title="true" :landscape="true">
+                            <v-spacer></v-spacer>
+                            <v-btn
+                              text
+                              color="success"
+                              @click="
+                                handleTimeClick(index, item.time);
+                                item.timeDialog = false;
+                              "
+                              >Save</v-btn
+                            >
+                            <v-btn text color="error" @click="item.timeDialog = false">Cancel</v-btn>
 
-  </v-checkbox>
-</v-col>
+                            <!-- $refs.itemdialog.save(item.time) -->
+                          </v-time-picker>
+                        </v-dialog>
+                      </v-col>
+                      <v-col style="padding: 4px;">
+                        <v-btn icon style=" margin-top: 16px;" @click="handleScheduleDelete(item)">
+                          <v-icon color="secondary">mdi-close</v-icon>
+                        </v-btn>
+                      </v-col>
+                      <v-col cols="12"> {{ scheduleText(item.days, item.time) }} </v-col>
 
-              <!-- <v-checkbox v-for"day in item.days" checkboxOn="mdi-delete" checkboxOff="mdi-pencil" checkboxIndeterminate="mdi-fire" label="Do this?" v-model="day">
+                      <!-- <v-checkbox v-for"day in item.days" checkboxOn="mdi-delete" checkboxOff="mdi-pencil" checkboxIndeterminate="mdi-fire" label="Do this?" v-model="day">
               </v-checkbox> -->
-          </v-row>
-
-          <template v-slot:activator="{ on, attrs }">
-            <v-text-field
-              v-model="time"
-              label="Picker in dialog"
-              prepend-icon="access_time"
-              readonly
-              v-bind="attrs"
-              v-on="on"
-            ></v-text-field>
-          </template>
-        </v-col>
-      </v-row>
-        </v-container>
-
-</template>
+                    </v-row>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </template>
           </v-data-iterator>
 
           <v-divider></v-divider>
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" text @click="scheduleDialog = false"> Close </v-btn>
+            <v-btn
+              text
+              @click="
+                handleScheduleSave();
+                scheduleDialog = false;
+              "
+            >
+              Save
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -382,10 +382,11 @@ export default {
       alertText: 'No Message',
       showPasswordCheckBox: false,
       showMeetingPassword: false,
-      scheduleData: [],
-      daysIcons: ["mdi-alpha-s-circle","mdi-alpha-m-circle","mdi-alpha-t-circle","mdi-alpha-w-circle","mdi-alpha-t-circle","mdi-alpha-f-circle","mdi-alpha-s-circle"],
-      timeDialog:false,
-      time:null
+      daysIcons: ['mdi-alpha-s-circle', 'mdi-alpha-m-circle', 'mdi-alpha-t-circle', 'mdi-alpha-w-circle', 'mdi-alpha-t-circle', 'mdi-alpha-f-circle', 'mdi-alpha-s-circle'],
+      daysText: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      daysLetter: ['S', 'M', 'T', 'W', 'Th', 'F', 'S'],
+      timeDialog: false,
+      time: null,
     };
   },
   components: {
@@ -393,7 +394,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(['setZoomData'], ['setDarkMode']),
+    ...mapActions(['setZoomData'], ['setDarkMode'], ['setScheduleData']),
     generateZoomLink(zoomData) {
       /// / TODO: make this neater and smarter
       if (zoomData.password != '' && zoomData.password != undefined) {
@@ -479,11 +480,100 @@ export default {
         this.customAlert('Something went wrong. Check the Meeting ID');
       }
     },
-    handleScheduleClick(element){
-      console.log(element)
-      this.scheduleDialog= true
-      //this.scheduleData = element.scheduleData
-      this.scheduleData = [{days:[false,true,false,true,false,false,false], time:"01:29 PM"}, {days:[true,true,true,true,false,false,false], time:"01:29 PM"}]
+    handleScheduleClick(element) {
+      this.editKey = element.key;
+      this.scheduleDialog = true;
+      // this.$store.dispatch('setScheduleData', [
+      //   { days: [false, true, false, true, false, false, false], time: '13:29', key: 'MW-8:00 AM' },
+      //   { days: [true, true, true, true, false, false, false], time: '8:00', key: 'MW-8:00 PM' },
+      // ]);
+      this.$store.dispatch('setScheduleData', element.scheduleData);
+      // this.scheduleData = element.scheduleData
+      //  this.scheduleData = ;
+    },
+    handleScheduleSave() {
+      var vueApp = this;
+
+      var currentScheduleData = this.scheduleData;
+
+      currentScheduleData.forEach((item, i) => {
+        currentScheduleData[i].key = vueApp.generateScheduleKey(item.days, item.time);
+      });
+
+      // this.$store.dispatch('setScheduleData', currentScheduleData);
+
+      var currentData = this.zoomData;
+
+      currentData.forEach(data => {
+        if (vueApp.editKey == data.key) {
+          data.scheduleData = currentScheduleData;
+        }
+      });
+      this.zoomData = currentData;
+      // save data into zoomdata and dispatch
+      // trigger background to update and create alarms/notification fun
+    },
+    handleScheduleDelete(item) {
+      this.handleScheduleSave();
+      var currentScheduleData = [];
+      this.scheduleData.forEach((data, i) => {
+        if (data.key != item.key) currentScheduleData.push(data);
+      });
+      this.$store.dispatch('setScheduleData', currentScheduleData);
+    },
+    addEmptySchedule() {
+      var currentScheduleData = this.scheduleData;
+      if (currentScheduleData != undefined) {
+        currentScheduleData.push({ days: [false, false, false, false, false, false, false], time: '8:00', key: 'None-8:00 AM' });
+      } else {
+        currentScheduleData = [{ days: [false, false, false, false, false, false, false], time: '8:00', key: 'None-8:00 AM' }];
+      }
+      this.$store.dispatch('setScheduleData', currentScheduleData);
+    },
+    handleTimeClick(index, time) {
+      var copy = this.scheduleData;
+      copy[index].time = time;
+      copy[index].timeDialog = false;
+      this.$store.dispatch('setScheduleData', copy);
+    },
+    scheduleText(days, time) {
+      var daysText = '';
+      days.forEach((item, i) => {
+        if (item) daysText += this.daysLetter[i];
+      });
+      var mer = 'AM';
+      var timeSplit = time.split(':');
+
+      if (timeSplit[0] > 12) {
+        mer = 'PM';
+        timeSplit[0] -= 12;
+      }
+      if (daysText == '') daysText = 'None';
+
+      return daysText + ' - ' + timeSplit[0] + ':' + timeSplit[1] + ' ' + mer;
+    },
+    scheduleTextArrayBuilder(arr) {
+      if (arr == undefined || arr.length == 0) return '';
+      arr = arr.map(element => {
+        return this.scheduleText(element.days, element.time);
+      });
+      return arr.join(', ');
+    },
+    generateScheduleKey(days, time) {
+      var daysText = '';
+      days.forEach((item, i) => {
+        if (item) daysText += this.daysText[i];
+      });
+      var mer = 'AM';
+      var timeSplit = time.split(':');
+
+      if (timeSplit[0] > 12) {
+        mer = 'PM';
+        timeSplit[0] -= 12;
+      }
+      if (daysText == '') daysText = 'None';
+
+      return daysText + ' - ' + timeSplit[0] + ':' + timeSplit[1] + ' ' + mer;
     },
     validateData() {
       var meetingIdStr = this.inputZoomId + '';
@@ -512,7 +602,7 @@ for(var i=0; i<(id.length - amountOf4Char); i++){
       ret+=" "
     }
   }
-  
+
   var count = 0
 for(var i; i<id.length; i++)
 {
@@ -533,7 +623,6 @@ for(var i; i<id.length; i++)
     },
     getLinks() {
       browser.tabs.executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' }).then(results => {
-        console.log(results[0]);
         return results[0];
       });
     },
@@ -543,16 +632,18 @@ for(var i; i<id.length; i++)
         var links = results[0];
         var linksFound = [];
         links.forEach((link, i) => {
-          if (link.includes('zoom')) {
+          if (link.includes('zoom.us/j/') || link.includes('zoom.us/w/') || link.includes('zoom.us/wc/')) {
+            // .us suffix + valid filler should guarantee it's a zoomie
             // do some magic to determine if is zoom link
-            if (link.search('/[a-z]/\\d\\d\\d\\d\\d\\d\\d\\d\\d+') != -1) {
+            if (link.search('[0-9]{9,}') != -1) {
+              // passing the extraction test means there is an ID to be extracted
               linksFound.push(link);
             }
           }
         });
         if (linksFound.length > 0) {
           var link = linksFound[0];
-          this.inputZoomId = link.match('\\d\\d\\d\\d\\d\\d\\d\\d\\d+')[0];
+          this.inputZoomId = link.match('[0-9]{9,}')[0];
           this.inputZoomPassword = new URL(link).searchParams.get('pwd');
           if (this.inputZoomPassword != null) {
             this.showPasswordCheckBox = true;
@@ -575,7 +666,6 @@ for(var i; i<id.length; i++)
       this.zoomData = currentData;
     },
 
-
     // sendNotification(title, message)
   },
   computed: {
@@ -595,6 +685,9 @@ for(var i; i<id.length; i++)
         this.$store.dispatch('setDarkMode', value);
       },
     },
+    scheduleData() {
+      return this.$store.state.scheduleData;
+    },
     dragOptions() {
       return {
         animation: 200,
@@ -608,6 +701,10 @@ for(var i; i<id.length; i++)
       return 0;
     },
     editModeText() {
+      if (this.editMode) return 'Edit';
+      return 'Add';
+    },
+    saveModeText() {
       if (this.editMode) return 'Save';
       return 'Add';
     },
@@ -617,9 +714,11 @@ for(var i; i<id.length; i++)
 
     browser.tabs.executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' }).then(results => {
       results[0].forEach((item, i) => {
-        if (item.includes('zoom')) {
+        if (item.includes('zoom.us/j/') || item.includes('zoom.us/w/') || item.includes('zoom.us/wc/')) {
+          // .us suffix + valid filler should guarantee it's a zoomie
           // do some magic to determine if is zoom link
-          if (item.search('/[a-z]/\\d\\d\\d\\d\\d\\d\\d\\d\\d+') != -1) {
+          if (item.search('[0-9]{9,}') != -1) {
+            // passing the extraction test means there is an ID to be extracted
             console.log('found');
             this.zoomLinkFound = true;
           }
