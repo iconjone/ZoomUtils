@@ -255,15 +255,23 @@
             </v-list-item>
             <v-list-item>
               <v-list-item-content>
+                <v-list-item-title>Organizing Meetings:</v-list-item-title>
+                <div class="body-2">
+                  Drag and drop Meeting Rows in the position you'd like.
+                </div>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-content>
                 <v-list-item-title>Setting Notifications:</v-list-item-title>
                 <div class="body-2">
-                  To add meeting times, expand the meeting options by click on the meeting row. Select the <v-icon color="secondary" small>mdi-calendar</v-icon> icon to open the
-                  meeting times dialog. Add or Edit the meeting dialog by selecting the days that the Zoom Meeting meets on as well as clicking the the
+                  To add meeting times, expand the meeting options by clicking on the meeting row. Select the <v-icon color="secondary" small>mdi-calendar</v-icon> icon to open the
+                  meeting times dialog. Add or Edit the meeting schedule by selecting the days that the Zoom Meeting meets on as well as clicking the the
                   <v-icon color="secondary" small>mdi-access_time</v-icon> icon to set the meeting time. To delete a meeting time, select the
                   <v-icon color="secondary" small>mdi-close</v-icon> icon.<br />
                   To set notifications on for a class, expand the meeting options, and switch the Notifications Switch to the on position.
                   <br />
-                  To set Auto Join on(Which will automatically open Zoom Meetings at the inputted time) or adjust the reminders interval, open the menu and select the
+                  To set Auto Join on (Which will automatically open Zoom Meetings at the inputted time) or adjust the reminders interval, open the menu and select the
                   <v-icon color="secondary" small>mdi-cog</v-icon> icon and adjust the parameters in the dialog that pops up.
                 </div>
               </v-list-item-content>
