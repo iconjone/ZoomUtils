@@ -1,8 +1,8 @@
 {
   "name": "zoomutils",
-  "version": "2.1.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "Zoom Utils in Progress",
+  "description": "Zoom Utils",
   "author": "Jonathan Samuel",
   "scripts": {
     "serve": "vue-cli-service build --mode development --watch",

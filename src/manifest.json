@@ -1,7 +1,7 @@
 {
   "name": "Zoom Utils Revamp",
   "description": "Zoom Utils for Zoom University",
-  "version": "2.1.0",
+  "version": "2.0.0",
   "manifest_version": 2,
   "permissions": ["activeTab", "storage", "<all_urls>", "notifications", "alarms"],
   "icons": {

@@ -3,8 +3,8 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import VuexWebExtensions from 'vuex-webextensions';
 
-import moment from 'moment/src/moment';
-
+// import moment from 'moment/src/moment';
+import * as moment from 'moment';
 import * as actions from './store/actions';
 import * as getters from './store/getters';
 import mutations from './store/mutations';
