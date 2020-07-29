@@ -1,5 +1,5 @@
 {
-  "name": "Zoom Utils Revamp",
+  "name": "Zoom Utils",
   "description": "Zoom Utils for Zoom University",
   "version": "2.0.0",
   "manifest_version": 2,
@@ -16,7 +16,7 @@
   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
   "browser_action": {
     "default_popup": "popup/popup.html",
-    "default_title": "Zoom Utils Revamp",
+    "default_title": "Zoom Utils",
     "default_icon": {
       "16": "icons/icon_16.png",
       "48": "icons/icon_48.png",
