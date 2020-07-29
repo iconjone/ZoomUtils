@@ -15,14 +15,14 @@ const vuetify = new Vuetify({
     },
     themes: {
       light: {
-        primary: '#002f57',
+        primary: '#004785',
         secondary: '#adb5bd',
         accent: '#db6f02',
         error: '#b71c1c',
         success: '#27b81a',
       },
       dark: {
-        primary: '#002f57',
+        primary: '#004785',
         secondary: '#adb5bd',
         accent: '#db6f02',
         error: '#b71c1c',

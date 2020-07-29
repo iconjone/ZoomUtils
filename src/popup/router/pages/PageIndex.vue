@@ -64,7 +64,7 @@
           <v-list-item>
             <v-icon>mdi-weather-sunny</v-icon>
             <v-list-item-action>
-              <v-switch v-model="isDark" inset color="secondary"></v-switch>
+              <v-switch v-model="isDark" inset color="primary"></v-switch>
             </v-list-item-action>
             <v-icon class="pl-2">mdi-weather-night</v-icon>
           </v-list-item>
@@ -215,6 +215,50 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn text @click="infoDialog = false"> Close </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="settingsDialog" persistent width="500">
+        <v-card>
+          <v-card-title>
+            Settings
+          </v-card-title>
+          <v-card-subtitle>
+            Explainging some of the settings we have
+          </v-card-subtitle>
+
+          <!-- <v-card-text>
+
+          </v-card-text> -->
+          <v-container fluid>
+            <v-combobox
+              color="white"
+              :deletable-chips="true"
+              v-model="reminder"
+              :items="reminderItems"
+              label="Input Reminder Intervals in Minutes (Leave Empty for no Reminders)"
+              multiple
+              :clearable="true"
+              chips
+            ></v-combobox>
+            <v-switch v-model="autoJoin" label="Auto Join Zoom Meetings"></v-switch>
+          </v-container>
+
+          <v-divider></v-divider>
+
+          <v-card-actions>
+            <v-btn
+              text
+              @click="
+                reminder = [15];
+                autoJoin = false;
+              "
+              color="error"
+            >
+              Reset
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn text @click="settingsDialog = false"> Close </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -371,6 +415,7 @@ export default {
       infoDialog: false,
       addDialog: false,
       scheduleDialog: false,
+      settingsDialog: false,
       inputZoomName: null,
       inputZoomId: null,
       inputZoomInfo: null,
@@ -388,6 +433,7 @@ export default {
       daysLetter: ['S', 'M', 'T', 'W', 'Th', 'F', 'S'],
       timeDialog: false,
       time: null,
+      reminderItems: [5, 10, 15, 30, 45, 60],
     };
   },
   components: {
@@ -616,7 +662,9 @@ export default {
       return ret; // spaced out version out version of the id
     },
     openSettings() {
-      browser.runtime.openOptionsPage();
+      //  browser.runtime.openOptionsPage();
+      this.drawer = false;
+      this.settingsDialog = true;
     },
     updateNotifications() {
       browser.runtime.sendMessage({

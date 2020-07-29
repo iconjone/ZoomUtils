@@ -42,9 +42,9 @@ browser.runtime.onInstalled.addListener(function(details) {
     browser.storage.sync
       .set({
         zoomData: [
-          { class: 'ESET 210', meetingID: '12345678', info: 'Click on the info Icon!', key: 1, notification: false },
-          { class: 'CSCE 222', meetingID: '123456789', info: 'HELL MW 10:20 AM', key: 2, notification: false },
-          { class: 'PHYS 207', meetingID: '12345679', info: 'TA SESSION 3:00 PM', key: 3, notification: false },
+          { class: 'ESET 210', meetingID: '123456789', info: 'Click on the info Icon!', key: 1, notification: false },
+          { class: 'CSCE 222', meetingID: '123456789', info: 'Meet with Professor', key: 2, notification: false },
+          { class: 'PHYS 207', meetingID: '123456789', info: 'Homework due', key: 3, notification: false },
         ],
       })
       .then(promise => {
@@ -131,14 +131,13 @@ browser.tabs.onActivated.addListener(listener => {
 
 function createNotificationHandler() {
   browser.alarms.clearAll();
-  console.log(store.state.zoomData, 'looking for this');
   var zoomData = store.state.zoomData;
   zoomData.forEach((zoom, z) => {
     if (zoom.scheduleData != undefined)
       zoom.scheduleData.forEach((schedule, s) => {
-        console.log(schedule);
         schedule.days.forEach((day, d) => {
           if (zoom.notification && day) {
+            if (store.state.reminder != [] && store.state.reminder != undefined);
             store.state.reminder.forEach((item, i) => {
               browser.alarms.create(
                 JSON.stringify({ data: zoom, timeDelay: item }), // optional string with more data
@@ -262,7 +261,7 @@ browser.alarms.onAlarm.addListener(alarm => {
             iconUrl: 'icons/icon_128.png',
             type: 'basic',
             title: alarmData.data.class + ' is starting now.',
-            message: alarmData.data.class + ' is starting now. Click to launch now.',
+            message: alarmData.data.class + ' is starting now. Click to launch.',
           })
           .then(notification => {
             browser.notifications.onClicked.addListener(notification => {
