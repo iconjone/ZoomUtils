@@ -264,7 +264,7 @@
                   To set notifications on for a class, expand the meeting options, and switch the Notifications Switch to the on position.
                   <br />
                   To set Auto Join on(Which will automatically open Zoom Meetings at the inputted time) or adjust the reminders interval, open the menu and select the
-                  <v-icon color="secondary" small>mdi-cog</v-icon> icon and adjust the paramters in the dialog that pops up.
+                  <v-icon color="secondary" small>mdi-cog</v-icon> icon and adjust the parameters in the dialog that pops up.
                 </div>
               </v-list-item-content>
             </v-list-item>
