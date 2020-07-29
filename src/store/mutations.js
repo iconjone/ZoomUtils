@@ -13,4 +13,10 @@ export default {
   [types.UPDATE_SCHEDULE_DATA](state, payload) {
     state.scheduleData = payload;
   },
+  [types.UPDATE_REMINDER](state, payload) {
+    state.reminder = payload;
+  },
+  [types.UPDATE_AUTO_JOIN](state, payload) {
+    state.autoJoin = payload;
+  },
 };

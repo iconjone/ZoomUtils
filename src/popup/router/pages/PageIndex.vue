@@ -557,7 +557,7 @@ export default {
       arr = arr.map(element => {
         return this.scheduleText(element.days, element.time);
       });
-      return arr.join(',');
+      return arr.join(', ');
     },
     generateScheduleKey(days, time) {
       var daysText = '';

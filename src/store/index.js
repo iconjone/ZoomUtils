@@ -15,6 +15,8 @@ export default new Vuex.Store({
     zoomData: [],
     darkmode: false,
     scheduleData: [],
+    reminder: [],
+    autoJoin: false,
   },
   getters,
   mutations,
