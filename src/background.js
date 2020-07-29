@@ -2,7 +2,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import VuexWebExtensions from 'vuex-webextensions';
-import moment from 'moment';
+
+import moment from 'moment/src/moment';
 
 import * as actions from './store/actions';
 import * as getters from './store/getters';
@@ -287,6 +288,8 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
     createNotificationHandler();
   }
 });
+
+// Standard Google Universal Analytics code
 
 // https://stackoverflow.com/questions/56815002/store-data-from-background-js-into-the-vuex-store
 /// / TODO: We need to figure out how to use this npm package to pass data from stores.

@@ -154,7 +154,15 @@
                   <v-col class="ps-4" cols="4">
                     <v-tooltip bottom>
                       <template v-slot:activator="{ on, attrs }">
-                        <v-btn target="blank" :href="generateZoomLink(element)" class="mx-4" style="width:100%; " color="primary" v-bind="attrs" v-on="on"
+                        <v-btn
+                          target="blank"
+                          :href="generateZoomLink(element)"
+                          class="mx-4"
+                          style="width:100%; "
+                          color="primary"
+                          v-bind="attrs"
+                          v-on="on"
+                          @click="meetingLaunched(element)"
                           >{{ formatMeetingID(element.meetingID) }}
                         </v-btn>
                       </template>
@@ -632,17 +640,10 @@ export default {
       return false;
     },
     formatMeetingID(id) {
-      console.log(id);
-      console.log(id.length, id.length % 3, 'info about num');
-      // var id
-      // id.length gives you the lenght of it
-      // id.substring(i,j) returns the string at that index
-      // rewrite this into a recursive function
       var ret = '';
 
       var amountOf4s = id.length % 3;
       var amountOf4Char = amountOf4s * 4;
-      console.log(amountOf4s, amountOf4Char);
       for (var i = 0; i < id.length - amountOf4Char; i++) {
         ret += id[i];
         if ((i + 1) % 3 == 0 && i != 0) {
@@ -671,38 +672,58 @@ export default {
         greeting: 'createNotificationHandler',
       });
     },
+    meetingLaunched(data) {
+      console.log(data);
+      var send = JSON.parse(JSON.stringify(data));
+      try {
+        // remove private info like meetingId and password
+        send.meetingID = '*****';
+        send.password = '*****';
+        _gaq.push(['_trackEvent', 'meetingLaunch', JSON.stringify(data)]);
+      } catch (e) {}
+    },
     getLinks() {
-      browser.tabs.executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' }).then(results => {
-        return results[0];
-      });
+      browser.tabs
+        .executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' })
+        .then(results => {
+          return results[0];
+        })
+        .catch(e => {
+          console.log(e);
+        });
     },
     parseLinks(link) {
       // https://stackoverflow.com/questions/11684454/getting-the-source-html-of-the-current-page-from-chrome-extension
-      browser.tabs.executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' }).then(results => {
-        var links = results[0];
-        var linksFound = [];
-        links.forEach((link, i) => {
-          if (link.includes('zoom.us/j/') || link.includes('zoom.us/w/') || link.includes('zoom.us/wc/')) {
-            // .us suffix + valid filler should guarantee it's a zoomie
-            // do some magic to determine if is zoom link
-            if (link.search('[0-9]{9,}') != -1) {
-              // passing the extraction test means there is an ID to be extracted
-              linksFound.push(link);
+      browser.tabs
+        .executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' })
+        .then(results => {
+          var links = results[0];
+          var linksFound = [];
+          links.forEach((link, i) => {
+            if (link.includes('zoom.us/j/') || link.includes('zoom.us/w/') || link.includes('zoom.us/wc/')) {
+              // .us suffix + valid filler should guarantee it's a zoomie
+              // do some magic to determine if is zoom link
+              if (link.search('[0-9]{9,}') != -1) {
+                // passing the extraction test means there is an ID to be extracted
+                linksFound.push(link);
+              }
             }
+          });
+          if (linksFound.length > 0) {
+            var link = linksFound[0];
+            this.inputZoomId = link.match('[0-9]{9,}')[0];
+            this.inputZoomPassword = new URL(link).searchParams.get('pwd');
+            if (this.inputZoomPassword != null) {
+              this.showPasswordCheckBox = true;
+            }
+            this.addDialog = true;
+          } else {
+            customAlert('Could not find any Zoom Links :(');
           }
+        })
+        .catch(e => {
+          console.log(e);
         });
-        if (linksFound.length > 0) {
-          var link = linksFound[0];
-          this.inputZoomId = link.match('[0-9]{9,}')[0];
-          this.inputZoomPassword = new URL(link).searchParams.get('pwd');
-          if (this.inputZoomPassword != null) {
-            this.showPasswordCheckBox = true;
-          }
-          this.addDialog = true;
-        } else {
-          customAlert('Could not find any Zoom Links :(');
-        }
-      });
     },
     handleNotificationToggle(element) {
       element.notification = !element.notification;
@@ -779,20 +800,25 @@ export default {
   created() {
     console.log(this, 'created');
 
-    browser.tabs.executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' }).then(results => {
-      results[0].forEach((item, i) => {
-        if (item.includes('zoom.us/j/') || item.includes('zoom.us/w/') || item.includes('zoom.us/wc/')) {
-          // .us suffix + valid filler should guarantee it's a zoomie
-          // do some magic to determine if is zoom link
-          if (item.search('[0-9]{9,}') != -1) {
-            // passing the extraction test means there is an ID to be extracted
-            console.log('found');
-            this.zoomLinkFound = true;
+    browser.tabs
+      .executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' })
+      .then(results => {
+        results[0].forEach((item, i) => {
+          if (item.includes('zoom.us/j/') || item.includes('zoom.us/w/') || item.includes('zoom.us/wc/')) {
+            // .us suffix + valid filler should guarantee it's a zoomie
+            // do some magic to determine if is zoom link
+            if (item.search('[0-9]{9,}') != -1) {
+              // passing the extraction test means there is an ID to be extracted
+              console.log('found');
+              this.zoomLinkFound = true;
+            }
           }
-        }
+        });
+        // return results[0];
+      })
+      .catch(e => {
+        console.log(e);
       });
-      // return results[0];
-    });
   },
   watch: {
     isDark() {

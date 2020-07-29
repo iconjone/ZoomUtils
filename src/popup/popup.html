@@ -4,8 +4,12 @@
     <meta charset="UTF-8" />
     <title>Zoom Utils</title>
     <link rel="stylesheet" href="popup.css" />
+
     <% if (NODE_ENV === 'development') { %>
     <!-- Load some resources only in development environment -->
+    <% } %> <% if (NODE_ENV != 'development') { %>
+    <!-- Load some resources only not in development environment -->
+    <script src="analytics.js"></script>
     <% } %>
   </head>
   <body>
