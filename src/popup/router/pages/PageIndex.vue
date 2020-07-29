@@ -584,6 +584,41 @@ export default {
 
       return false;
     },
+    formatMeetingID(id){
+      console.log(id)
+      console.log(id.length, id.length%3, "info about num")
+      //var id
+//id.length gives you the lenght of it
+//id.substring(i,j) returns the string at that index
+//rewrite this into a recursive function
+var ret = ""
+
+var amountOf4s = id.length % 3
+var amountOf4Char = amountOf4s * 4
+console.log(amountOf4s,amountOf4Char)
+for(var i=0; i<(id.length - amountOf4Char); i++){
+  ret += id[i]
+    if((i+1)%3 == 0 && i!=0)
+    {
+      ret+=" "
+    }
+  }
+
+  var count = 0
+for(var i; i<id.length; i++)
+{
+  count++
+  ret += id[i]
+    if((count)%4 == 0 && i!=0)
+    {
+      ret+=" "
+    }
+}
+
+
+
+      return ret //spaced out version out version of the id
+    },
     openSettings() {
       browser.runtime.openOptionsPage();
     },
