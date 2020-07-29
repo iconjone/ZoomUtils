@@ -106,7 +106,7 @@ function initStore() {
     createNotificationHandler();
   });
 }
-
+// store.dispatch('setAutoJoin', true);
 browser.tabs.onActivated.addListener(listener => {
   browser.tabs
     .executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' })
@@ -134,23 +134,24 @@ function createNotificationHandler() {
   console.log(store.state.zoomData, 'looking for this');
   var zoomData = store.state.zoomData;
   zoomData.forEach((zoom, z) => {
-    zoom.scheduleData.forEach((schedule, s) => {
-      console.log(schedule);
-      schedule.days.forEach((day, d) => {
-        if (zoom.notification && day) {
-          store.state.reminder.forEach((item, i) => {
+    if (zoom.scheduleData != undefined)
+      zoom.scheduleData.forEach((schedule, s) => {
+        console.log(schedule);
+        schedule.days.forEach((day, d) => {
+          if (zoom.notification && day) {
+            store.state.reminder.forEach((item, i) => {
+              browser.alarms.create(
+                JSON.stringify({ data: zoom, timeDelay: item }), // optional string with more data
+                { when: findClosestFutureTime(d, schedule.time, item), periodInMinutes: 10080 } // optional object
+              );
+            });
             browser.alarms.create(
-              JSON.stringify({ data: zoom, timeDelay: item }), // optional string with more data
-              { when: findClosestFutureTime(d, schedule.time, item), periodInMinutes: 10080 } // optional object
+              JSON.stringify({ data: zoom, timeDelay: 0 }), // optional string with more data
+              { when: findClosestFutureTime(d, schedule.time, 0), periodInMinutes: 10080 } // optional object
             );
-          });
-          browser.alarms.create(
-            JSON.stringify({ data: zoom, timeDelay: 0 }), // optional string with more data
-            { when: findClosestFutureTime(d, schedule.time, 0), periodInMinutes: 10080 } // optional object
-          );
-        }
+          }
+        });
       });
-    });
   });
 }
 
@@ -166,7 +167,6 @@ function findClosestFutureTime(dayIndex, time, delay) {
     .subtract(delay, 'minutes');
 
   if (date < moment()) date.add(7, 'days');
-  console.log(date, date.valueOf());
   return date.valueOf();
 }
 
@@ -188,7 +188,6 @@ browser.alarms.onAlarm.addListener(alarm => {
     }
   });
 
-  console.log(alarm, moment(alarm.scheduledTime) > moment().subtract(5, 'minutes'));
   if (moment(alarm.scheduledTime) > moment().subtract(5, 'minutes')) {
     var alarmData = JSON.parse(alarm.name);
     if (alarmData.timeDelay != 0) {
@@ -200,9 +199,9 @@ browser.alarms.onAlarm.addListener(alarm => {
           message: alarmData.data.class + ' is starting in ' + alarmData.timeDelay + ' minutes. Click to launch now.',
         })
         .then(notification => {
-          console.log(notification);
           browser.notifications.onClicked.addListener(notification => {
-            alert('clicked');
+            var zoomLink = generateZoomLink(alarmData.data);
+            window.open(zoomLink, 'extension_popup');
           });
         });
     } else {
@@ -210,36 +209,41 @@ browser.alarms.onAlarm.addListener(alarm => {
         browser.notifications
           .create('', {
             iconUrl: 'icons/icon_128.png',
-            type: 'progress',
+            type: 'basic',
             title: alarmData.data.class + ' is starting now.',
-            message: alarmData.data.class + ' is starting now. Auto Joining in 5 seconds. Click to prevent launch.',
-            progress: 0,
+            message: alarmData.data.class + ' is starting now. Auto Joining in 15 seconds. Click to prevent launch.',
+            requireInteraction: true,
           })
           .then(notification => {
-            console.log(notification);
             var preventLaunch = false;
             var timer = new Timer();
             timer.stop();
-            timer.start(1000 * 5);
-            timer.on('tick', ms => {
-              console.log(Math.round(100 - (timer.time / timer.duration) * 100), notification);
-              browser.notifications
-                .update(
-                  notification, // string
-                  {
-                    message: alarmData.data.class + ' is starting now. Auto Joining in ' + Math.round(timer.time / 1000) + ' seconds. Click to prevent launch.',
-                    progress: Math.round(100 - (timer.time / timer.duration) * 100),
-                  } // NotificationOptions
-                )
-                .then(update => {
-                  if (!update) {
-                    preventLaunch = true;
-                    timer.stop();
-                  }
-                });
-            });
+            timer.start(1000 * 15);
+            // timer.on('tick', ms => {
+            //   console.log(Math.round(100 - (timer.time / timer.duration) * 100), notification);
+            //   var test = browser.notifications
+            //     .update(
+            //       notification, // string
+            //       {
+            //         message: alarmData.data.class + ' is starting now. Auto Joining in ' + Math.round(timer.time / 1000) + ' seconds. Click to prevent launch.',
+            //         progress: Math.round(100 - (timer.time / timer.duration) * 100),
+            //       } // NotificationOptions
+            //     )
+            //     .then(update => {
+            //       if (!update) {
+            //         preventLaunch = true;
+            //         timer.stop();
+            //       }
+            //       console.log(update);
+            //     });
+            //   console.log(test);
+            // });
 
             browser.notifications.onClicked.addListener(notification => {
+              preventLaunch = true;
+              timer.stop();
+            });
+            browser.notifications.onClosed.addListener(notification => {
               preventLaunch = true;
               timer.stop();
             });
@@ -247,7 +251,8 @@ browser.alarms.onAlarm.addListener(alarm => {
             timer.on('done', () => {
               if (!preventLaunch) {
                 var zoomLink = generateZoomLink(alarmData.data);
-                browser.tabs.create({ url: zoomLink });
+                window.open(zoomLink, 'extension_popup');
+                browser.notifications.clear(notification);
               }
             });
           });
@@ -260,10 +265,9 @@ browser.alarms.onAlarm.addListener(alarm => {
             message: alarmData.data.class + ' is starting now. Click to launch now.',
           })
           .then(notification => {
-            console.log(notification);
             browser.notifications.onClicked.addListener(notification => {
               var zoomLink = generateZoomLink(alarmData.data);
-              browser.tabs.create({ url: zoomLink });
+              window.open(zoomLink, 'extension_popup');
             });
           });
       }
@@ -278,6 +282,12 @@ function generateZoomLink(zoomData) {
   }
   return 'zoommtg://jonathan.zoom.us/join?action=join&confno=' + zoomData.meetingID;
 }
+
+browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.greeting == 'createNotificationHandler') {
+    createNotificationHandler();
+  }
+});
 
 // https://stackoverflow.com/questions/56815002/store-data-from-background-js-into-the-vuex-store
 /// / TODO: We need to figure out how to use this npm package to pass data from stores.
