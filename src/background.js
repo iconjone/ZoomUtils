@@ -2,10 +2,12 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import VuexWebExtensions from 'vuex-webextensions';
+import moment from 'moment';
 
 import * as actions from './store/actions';
 import * as getters from './store/getters';
 import mutations from './store/mutations';
+import Timer from 'tiny-timer';
 
 global.browser = require('webextension-polyfill');
 
@@ -131,17 +133,41 @@ function createNotificationHandler() {
   browser.alarms.clearAll();
   console.log(store.state.zoomData, 'looking for this');
   var zoomData = store.state.zoomData;
-  zoomData.forEach((zoom, i) => {
-    zoom.scheduleData.forEach((schedule, i) => {
+  zoomData.forEach((zoom, z) => {
+    zoom.scheduleData.forEach((schedule, s) => {
       console.log(schedule);
-      if (zoomData.notification) {
-        browser.alarms.create(
-          JSON.stringify(zoom), // optional string with more data
-          { when: Date.now(), periodInMinutes: 10080 } // optional object
-        );
-      }
+      schedule.days.forEach((day, d) => {
+        if (zoom.notification && day) {
+          store.state.reminder.forEach((item, i) => {
+            browser.alarms.create(
+              JSON.stringify({ data: zoom, timeDelay: item }), // optional string with more data
+              { when: findClosestFutureTime(d, schedule.time, item), periodInMinutes: 10080 } // optional object
+            );
+          });
+          browser.alarms.create(
+            JSON.stringify({ data: zoom, timeDelay: 0 }), // optional string with more data
+            { when: findClosestFutureTime(d, schedule.time, 0), periodInMinutes: 10080 } // optional object
+          );
+        }
+      });
     });
   });
+}
+
+function findClosestFutureTime(dayIndex, time, delay) {
+  var hour = time.split(':')[0];
+  //  if (hour == '00') hour = 12;
+
+  var date = moment()
+    .day(dayIndex)
+    .hour(hour)
+    .minute(time.split(':')[1])
+    .second(0)
+    .subtract(delay, 'minutes');
+
+  if (date < moment()) date.add(7, 'days');
+  console.log(date, date.valueOf());
+  return date.valueOf();
 }
 
 // console.log("creating alarm")
@@ -152,9 +178,106 @@ function createNotificationHandler() {
 // )
 //
 browser.alarms.onAlarm.addListener(alarm => {
-  console.log(alarm);
-  chrome.notifications.create('', { iconUrl: 'icons/icon_128.png', type: 'basic', title: 'test', message: "what's up hello test" });
+  // clear All active current notifications so user doesn't have too many
+  browser.notifications.getAll().then(notifications => {
+    notifications = Object.keys(notifications);
+    if (notifications.length > 0) {
+      notifications.forEach(notification => {
+        browser.notifications.clear(notification);
+      });
+    }
+  });
+
+  console.log(alarm, moment(alarm.scheduledTime) > moment().subtract(5, 'minutes'));
+  if (moment(alarm.scheduledTime) > moment().subtract(5, 'minutes')) {
+    var alarmData = JSON.parse(alarm.name);
+    if (alarmData.timeDelay != 0) {
+      browser.notifications
+        .create('', {
+          iconUrl: 'icons/icon_128.png',
+          type: 'basic',
+          title: alarmData.data.class + ' is starting soon.',
+          message: alarmData.data.class + ' is starting in ' + alarmData.timeDelay + ' minutes. Click to launch now.',
+        })
+        .then(notification => {
+          console.log(notification);
+          browser.notifications.onClicked.addListener(notification => {
+            alert('clicked');
+          });
+        });
+    } else {
+      if (store.state.autoJoin) {
+        browser.notifications
+          .create('', {
+            iconUrl: 'icons/icon_128.png',
+            type: 'progress',
+            title: alarmData.data.class + ' is starting now.',
+            message: alarmData.data.class + ' is starting now. Auto Joining in 5 seconds. Click to prevent launch.',
+            progress: 0,
+          })
+          .then(notification => {
+            console.log(notification);
+            var preventLaunch = false;
+            var timer = new Timer();
+            timer.stop();
+            timer.start(1000 * 5);
+            timer.on('tick', ms => {
+              console.log(Math.round(100 - (timer.time / timer.duration) * 100), notification);
+              browser.notifications
+                .update(
+                  notification, // string
+                  {
+                    message: alarmData.data.class + ' is starting now. Auto Joining in ' + Math.round(timer.time / 1000) + ' seconds. Click to prevent launch.',
+                    progress: Math.round(100 - (timer.time / timer.duration) * 100),
+                  } // NotificationOptions
+                )
+                .then(update => {
+                  if (!update) {
+                    preventLaunch = true;
+                    timer.stop();
+                  }
+                });
+            });
+
+            browser.notifications.onClicked.addListener(notification => {
+              preventLaunch = true;
+              timer.stop();
+            });
+
+            timer.on('done', () => {
+              if (!preventLaunch) {
+                var zoomLink = generateZoomLink(alarmData.data);
+                browser.tabs.create({ url: zoomLink });
+              }
+            });
+          });
+      } else {
+        browser.notifications
+          .create('', {
+            iconUrl: 'icons/icon_128.png',
+            type: 'basic',
+            title: alarmData.data.class + ' is starting now.',
+            message: alarmData.data.class + ' is starting now. Click to launch now.',
+          })
+          .then(notification => {
+            console.log(notification);
+            browser.notifications.onClicked.addListener(notification => {
+              var zoomLink = generateZoomLink(alarmData.data);
+              browser.tabs.create({ url: zoomLink });
+            });
+          });
+      }
+    }
+  }
 });
+
+function generateZoomLink(zoomData) {
+  /// / TODO: make this neater and smarter
+  if (zoomData.password != '' && zoomData.password != undefined) {
+    return 'zoommtg://jonathan.zoom.us/join?action=join&confno=' + zoomData.meetingID + '&pwd=' + zoomData.password;
+  }
+  return 'zoommtg://jonathan.zoom.us/join?action=join&confno=' + zoomData.meetingID;
+}
 
 // https://stackoverflow.com/questions/56815002/store-data-from-background-js-into-the-vuex-store
 /// / TODO: We need to figure out how to use this npm package to pass data from stores.

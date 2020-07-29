@@ -394,7 +394,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(['setZoomData'], ['setDarkMode'], ['setScheduleData']),
+    ...mapActions(['setZoomData'], ['setDarkMode'], ['setScheduleData'], ['setReminder'], ['setAutoJoin']),
     generateZoomLink(zoomData) {
       /// / TODO: make this neater and smarter
       if (zoomData.password != '' && zoomData.password != undefined) {
@@ -549,6 +549,7 @@ export default {
         timeSplit[0] -= 12;
       }
       if (daysText == '') daysText = 'None';
+      if (timeSplit[0] == '00') timeSplit[0] = '12';
 
       return daysText + ' - ' + timeSplit[0] + ':' + timeSplit[1] + ' ' + mer;
     },
@@ -648,6 +649,22 @@ export default {
       },
       set(value) {
         this.$store.dispatch('setDarkMode', value);
+      },
+    },
+    reminder: {
+      get() {
+        return this.$store.state.reminder;
+      },
+      set(value) {
+        this.$store.dispatch('setReminder', value);
+      },
+    },
+    autoJoin: {
+      get() {
+        return this.$store.state.autoJoin;
+      },
+      set(value) {
+        this.$store.dispatch('setAutoJoin', value);
       },
     },
     scheduleData() {
