@@ -297,10 +297,12 @@
           <v-container fluid>
             <v-combobox
               color="white"
+              type="number"
               :deletable-chips="true"
+              no-data-text="No Reminders"
               v-model="reminder"
               :items="reminderItems"
-              label="Input Reminder Intervals in Minutes (Leave Empty for no Reminders)"
+              label="Reminder Intervals in Minutes. Type for custom intervals. (Empty for no Reminders)"
               multiple
               :clearable="true"
               chips
