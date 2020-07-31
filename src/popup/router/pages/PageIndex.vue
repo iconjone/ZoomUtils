@@ -176,6 +176,16 @@
               </v-expansion-panel-header>
               <v-expansion-panel-content>
                 <v-row>
+                  <v-col cols="2" class="center-list text-center">
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn icon @click="handleCopyClipBoardClick(element)" v-bind="attrs" v-on="on">
+                          <v-icon>mdi-clipboard-outline</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>Copy {{ element.class }} Meeting Link to Clipboard</span>
+                    </v-tooltip>
+                  </v-col>
                   <v-col class="center-list text-center">
                     {{ scheduleTextArrayBuilder(element.scheduleData) }}
                     <v-tooltip bottom>
@@ -600,6 +610,20 @@ export default {
       } else {
         this.customAlert('Something went wrong. Check the Meeting ID');
       }
+    },
+    handleCopyClipBoardClick(element) {
+      var link = 'https://zoom.us/j/' + element.meetingID;
+      if (element.password != '' && element.password != undefined) {
+        link += '?pwd=' + element.password;
+      }
+      navigator.clipboard
+        .writeText(link)
+        .then(() => {
+          this.customAlert('Link copied to clipboard');
+        })
+        .catch(err => {
+          this.customAlert('Link unable to be copied to clipboard');
+        });
     },
     handleScheduleClick(element) {
       this.editKey = element.key;
