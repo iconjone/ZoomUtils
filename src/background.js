@@ -100,15 +100,42 @@ initStore();
 function initStore() {
   browser.storage.sync.get().then(data => {
     console.log(data);
-    store.dispatch('initZoomData', data.zoomData);
-    store.dispatch('initDarkMode', data.darkmode);
-    store.dispatch('initReminder', data.reminder);
-    store.dispatch('initAutoJoin', data.autoJoin);
-    createNotificationHandler();
+    try {
+      store.dispatch('initZoomData', data.zoomData);
+      store.dispatch('initDarkMode', data.darkmode);
+      store.dispatch('initReminder', data.reminder);
+      store.dispatch('initAutoJoin', data.autoJoin);
+      createNotificationHandler();
+    } catch (e) {
+      console.log('Some update error. Please reinstall.');
+    }
   });
 }
 // store.dispatch('setAutoJoin', true);
+browser.tabs.onUpdated.addListener(listener => {
+  browser.browserAction.setBadgeText({ text: '', tabId: listener.tabId });
+  browser.tabs
+    .executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' })
+    .then(results => {
+      results[0].forEach((item, i) => {
+        if (item.includes('zoom.us/j/') || item.includes('zoom.us/w/') || item.includes('zoom.us/wc/')) {
+          // .us suffix + valid filler should guarantee it's a zoomie
+          // do some magic to determine if is zoom link
+          if (item.search('[0-9]{9,}') != -1) {
+            // passing the extraction test means there is an ID to be extracted
+            browser.browserAction.setBadgeText({ text: 'ADD', tabId: listener.tabId });
+          }
+        }
+      });
+
+      // return results[0];
+    })
+    .catch(e => {
+      console.log(e);
+    });
+});
 browser.tabs.onActivated.addListener(listener => {
+  browser.browserAction.setBadgeText({ text: '', tabId: listener.tabId });
   browser.tabs
     .executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' })
     .then(results => {
@@ -212,41 +239,33 @@ browser.alarms.onAlarm.addListener(alarm => {
             iconUrl: 'icons/icon_128.png',
             type: 'basic',
             title: alarmData.data.class + ' is starting now.',
-            message: alarmData.data.class + ' is starting now. Auto Joining in 15 seconds. Click to prevent launch.',
-            requireInteraction: true,
+            message: alarmData.data.class + ' is starting now. Auto Joining in 15 seconds.',
+            buttons: [{ title: 'Cancel Auto-Join' }, { title: 'Join Now' }],
           })
           .then(notification => {
             var preventLaunch = false;
             var timer = new Timer();
             timer.stop();
             timer.start(1000 * 15);
-            // timer.on('tick', ms => {
-            //   console.log(Math.round(100 - (timer.time / timer.duration) * 100), notification);
-            //   var test = browser.notifications
-            //     .update(
-            //       notification, // string
-            //       {
-            //         message: alarmData.data.class + ' is starting now. Auto Joining in ' + Math.round(timer.time / 1000) + ' seconds. Click to prevent launch.',
-            //         progress: Math.round(100 - (timer.time / timer.duration) * 100),
-            //       } // NotificationOptions
-            //     )
-            //     .then(update => {
-            //       if (!update) {
-            //         preventLaunch = true;
-            //         timer.stop();
-            //       }
-            //       console.log(update);
-            //     });
-            //   console.log(test);
-            // });
 
-            browser.notifications.onClicked.addListener(notification => {
+            // browser.notifications.onClicked.addListener(notification => {
+            //   preventLaunch = true;
+            //   timer.stop();
+            // });
+            // browser.notifications.onClosed.addListener(notification => {
+            //   preventLaunch = true;
+            //   timer.stop();
+            // });
+            browser.notifications.onButtonClicked.addListener((id, index) => {
               preventLaunch = true;
               timer.stop();
-            });
-            browser.notifications.onClosed.addListener(notification => {
-              preventLaunch = true;
-              timer.stop();
+              if (index == 1) {
+                browser.notifications.clear(id);
+                var zoomLink = generateZoomLink(alarmData.data);
+                window.open(zoomLink, 'extension_popup');
+              }
+              // browser.notifications.clear(id);
+              // console.log("You chose: " + buttons[index].title);
             });
 
             timer.on('done', () => {
