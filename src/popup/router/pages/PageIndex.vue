@@ -814,6 +814,7 @@ export default {
         // remove private info like meetingId and password
         send.meetingID = '*****';
         send.password = '*****';
+        send.key = '*****';
         _gaq.push(['_trackEvent', 'meetingLaunch', JSON.stringify(data)]);
       } catch (e) {}
     },
