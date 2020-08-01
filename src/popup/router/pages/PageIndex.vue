@@ -78,6 +78,12 @@
       <v-spacer></v-spacer>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
+          <v-icon v-bind="attrs" v-on="on" @click="supportDialog = true" class="mr-2">mdi-gift-outline</v-icon>
+        </template>
+        <span>Support Us</span>
+      </v-tooltip>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
           <v-icon v-bind="attrs" v-on="on" @click="infoDialog = true">mdi-information-outline</v-icon>
         </template>
         <span>Learn More</span>
@@ -472,6 +478,42 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+
+      <v-dialog v-model="supportDialog" width="500">
+        <v-dialog v-model="venmoDialog" width="300">
+          <v-card>
+            <v-card-text>
+              <v-img :contain="true" src="../../../icons/venmo.png"></v-img>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn text @click="venmoDialog = false"> Close </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-card>
+          <v-card-title>
+            Support Us
+          </v-card-title>
+          <v-card-text>
+            We're a bunch of (hungry) college students who want to help other students get to class.<br />
+            Please consider supporting our team with a donation.
+          </v-card-text>
+          <v-card-text class="text-center">
+            <v-row>
+              <v-col cols="12"><v-btn color="primary" @click="venmoDialog = true">Venmo | @jonotsamuel</v-btn> </v-col>
+              <v-col cols="12">
+                <v-btn color="primary" href="https://www.paypal.com/paypalme/jonotsamuel/5" target="_blank">Paypal | jonotsamuel</v-btn>
+              </v-col>
+            </v-row>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn text @click="supportDialog = false"> Close </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
       <v-snackbar v-model="alert" :multi-line="true">
         {{ alertText }}
 
@@ -500,6 +542,8 @@ export default {
       addDialog: false,
       scheduleDialog: false,
       settingsDialog: false,
+      supportDialog: false,
+      venmoDialog: false,
       inputZoomName: null,
       inputZoomId: null,
       inputZoomInfo: null,
