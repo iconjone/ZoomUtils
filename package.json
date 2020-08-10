@@ -6,10 +6,10 @@
   "author": "Jonathan Samuel",
   "scripts": {
     "serve": "vue-cli-service build --mode development --watch",
-    "build": "cross-env NODE_ENV=production webpack --hide-modules",
+    "build": "cross-env NODE_ENV=production webpack --hide-modules --mode=production",
     "lint": "eslint --ext .js,.vue src",
     "build-zip": "npm run build && node scripts/build-zip.js",
-    "build:dev": "cross-env NODE_ENV=development webpack --hide-modules",
+    "build:dev": "cross-env NODE_ENV=development webpack --mode=development --hide-modules",
     "dev": "npm run watch:dev",
     "prettier": "prettier \"src/**/*.{js,vue}\"",
     "prettier:write": "npm run prettier -- --write",

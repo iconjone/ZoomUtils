@@ -514,7 +514,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <v-snackbar v-model="alert" :multi-line="true">
+      <v-snackbar v-model="alert" :multi-line="true" timeout="7500">
         {{ alertText }}
 
         <template v-slot:action="{ attrs }">
@@ -845,14 +845,35 @@ export default {
               }
             }
           });
+
           if (linksFound.length > 0) {
+            if (linksFound.length > 1) {
+              // and there are links in there that are different meeting ids
+
+              if (!linksFound.every((val, i, arr) => val === arr[0]))
+                this.customAlert(
+                  "Look's like the page has more than 1 Zoom link. If it is the incorrect meeting ID, try clicking the link you'd like to add and add it on the newly opened page."
+                );
+            }
             var link = linksFound[0];
+            var checkResult = this.sameLinkInZoomData(link);
+            console.log(checkResult);
+
             this.inputZoomId = link.match('[0-9]{9,}')[0];
             this.inputZoomPassword = new URL(link).searchParams.get('pwd');
-            if (this.inputZoomPassword != null) {
-              this.showPasswordCheckBox = true;
+
+            if (!checkResult.result) {
+              if (this.inputZoomPassword != null) {
+                this.showPasswordCheckBox = true;
+              }
+              this.addDialog = true;
+            } else if (checkResult.result) {
+              this.editMode = true;
+              checkResult.item.password = this.inputZoomPassword;
+              this.editZoomData(checkResult.item);
+              if (checkResult.action == 'edit') this.customAlert(checkResult.item.class + ' already exists. Editing ' + checkResult.item.class);
+              else this.customAlert(' New password applied to ' + checkResult.item.class + '! Save to edit ' + checkResult.item.class);
             }
-            this.addDialog = true;
           } else {
             customAlert('Could not find any Zoom Links :(');
           }
@@ -871,6 +892,26 @@ export default {
         }
       });
       this.zoomData = currentData;
+    },
+    sameLinkInZoomData(link) {
+      var ret = { result: false, name: '', action: 'new' };
+      var passwordCheck = new URL(link).searchParams.get('pwd');
+      this.zoomData.forEach(item => {
+        console.log(item.meetingID, link.match('[0-9]{9,}')[0], item.meetingID == link.match('[0-9]{9,}')[0]);
+        if (item.meetingID == link.match('[0-9]{9,}')[0]) {
+          // Meeting Id has matched
+          console.log('meeting id has matched');
+          if (item.password == passwordCheck) {
+            ret = { result: true, item: item, action: 'edit' };
+            return false;
+          } else {
+            ret = { result: true, item: item, action: 'editPassword' };
+            return false;
+          }
+        }
+      });
+
+      return ret;
     },
 
     // sendNotification(title, message)
