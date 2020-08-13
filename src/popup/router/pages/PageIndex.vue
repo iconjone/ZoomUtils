@@ -808,7 +808,6 @@ export default {
       });
     },
     meetingLaunched(data) {
-      console.log(data);
       var send = JSON.parse(JSON.stringify(data));
       try {
         // remove private info like meetingId and password
