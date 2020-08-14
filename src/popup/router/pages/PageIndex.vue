@@ -206,6 +206,9 @@
                   <v-col>
                     <v-switch label="Notifications" v-model="element.notification" v-on:click.stop="handleNotificationToggle(element)"></v-switch>
                   </v-col>
+                  <v-col>
+                    <v-switch label="Auto-Join" v-model="element.autoJoin" v-on:click.stop="handleAutoJoinToggle(element)"></v-switch>
+                  </v-col>
                 </v-row>
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -441,7 +444,7 @@
                                 handleScheduleSave();
                                 item.timeDialog = false;
                               "
-                              >Save</v-btn
+                              >SET</v-btn
                             >
                             <v-btn text color="error" @click="item.timeDialog = false">Cancel</v-btn>
 
@@ -450,7 +453,7 @@
                         </v-dialog>
                       </v-col>
                       <v-col style="padding: 4px;">
-                        <v-btn icon style=" margin-top: 16px;" @click="handleScheduleDelete(item)">
+                        <v-btn icon style=" margin-top: 16px;" @click="handleScheduleDelete(item, index)">
                           <v-icon color="secondary">mdi-close</v-icon>
                         </v-btn>
                       </v-col>
@@ -698,28 +701,31 @@ export default {
         currentScheduleData.forEach((item, i) => {
           currentScheduleData[i].key = vueApp.generateScheduleKey(item.days, item.time);
         });
-
-        // this.$store.dispatch('setScheduleData', currentScheduleData);
-
-        var currentData = this.zoomData;
-
-        currentData.forEach(data => {
-          if (vueApp.editKey == data.key) {
-            data.scheduleData = currentScheduleData;
-          }
-        });
-        this.zoomData = currentData;
-        // save data into zoomdata and dispatch
-        // trigger background to update and create alarms/notification fun
       }
-    },
-    handleScheduleDelete(item) {
-      this.handleScheduleSave();
-      var currentScheduleData = [];
-      this.scheduleData.forEach((data, i) => {
-        if (data.key != item.key) currentScheduleData.push(data);
+
+      // this.$store.dispatch('setScheduleData', currentScheduleData);
+
+      var currentData = this.zoomData;
+
+      currentData.forEach(data => {
+        if (vueApp.editKey == data.key) {
+          data.scheduleData = currentScheduleData;
+        }
       });
+      this.zoomData = currentData;
+      // save data into zoomdata and dispatch
+      // trigger background to update and create alarms/notification fun
+    },
+    handleScheduleDelete(item, index) {
+      var currentScheduleData = this.scheduleData;
+      console.log(item, index);
+      currentScheduleData.splice(index, 1);
+      console.log(currentScheduleData);
+      // this.scheduleData.forEach((data, i) => {
+      //   if (data.key != item.key) currentScheduleData.push(data);
+      // });
       this.$store.dispatch('setScheduleData', currentScheduleData);
+      this.handleScheduleSave();
     },
     addEmptySchedule() {
       var currentScheduleData = this.scheduleData;
@@ -729,6 +735,7 @@ export default {
         currentScheduleData = [{ days: [false, false, false, false, false, false, false], time: '8:00', key: 'None-8:00 AM' }];
       }
       this.$store.dispatch('setScheduleData', currentScheduleData);
+      //  this.$vuetify.goTo(10000);
     },
     handleTimeClick(index, time) {
       var copy = this.scheduleData;
@@ -898,6 +905,25 @@ export default {
       currentData.forEach(data => {
         if (element.key == data.key) {
           data.notification = element.notification;
+          if (!element.notification) {
+            element.autoJoin = false;
+            data.autoJoin = false;
+          }
+        }
+      });
+      this.zoomData = currentData;
+    },
+    handleAutoJoinToggle(element) {
+      element.autoJoin = !element.autoJoin;
+      var vueApp = this;
+      var currentData = this.zoomData;
+      currentData.forEach(data => {
+        if (element.key == data.key) {
+          data.autoJoin = element.autoJoin;
+          if (element.autoJoin) {
+            element.notification = true;
+            data.notification = true;
+          }
         }
       });
       this.zoomData = currentData;

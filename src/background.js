@@ -43,9 +43,9 @@ browser.runtime.onInstalled.addListener(function(details) {
     browser.storage.sync
       .set({
         zoomData: [
-          { class: 'ESET 210', meetingID: '123456789', info: 'Click on the info Icon!', key: 1, notification: false },
-          { class: 'CSCE 222', meetingID: '123456789', info: 'Meet with Professor', key: 2, notification: false },
-          { class: 'PHYS 207', meetingID: '123456789', info: 'Homework due', key: 3, notification: false },
+          { class: 'ESET 210', meetingID: '123456789', info: 'Click on the info Icon!', key: 1, notification: false, autoJoin: false },
+          { class: 'CSCE 222', meetingID: '123456789', info: 'Meet with Professor', key: 2, notification: false, autoJoin: false },
+          { class: 'PHYS 207', meetingID: '123456789', info: 'Homework due', key: 3, notification: false, autoJoin: false },
         ],
       })
       .then(promise => {
@@ -79,6 +79,13 @@ browser.runtime.onInstalled.addListener(function(details) {
         zoomData.forEach((item, i) => {
           zoomData[i].key = item.meetingID + item.class + item.info; // make the key id+name+info
           zoomData[i].notification = false;
+          if (zoomData[i].autoJoin == undefined) {
+            if (data.autoJoin == undefined || data.autoJoin) {
+              zoomData[i].autoJoin = true;
+            } else {
+              zoomData[i].autoJoin = false;
+            }
+          }
         });
         var promise = browser.storage.sync.set({ zoomData: zoomData });
         console.log(promise);
@@ -86,11 +93,11 @@ browser.runtime.onInstalled.addListener(function(details) {
       }
       if (data.reminder == undefined)
         browser.storage.sync.set({ reminder: ['15'] }).then(data => {
-          console.log('set reminder and auto join');
+          console.log('set reminder');
         });
       if (data.autoJoin == undefined)
         browser.storage.sync.set({ autoJoin: false }).then(data => {
-          console.log('set reminder and auto join');
+          console.log('set auto join to false (deprecated)');
         });
       if (data.webclient == undefined)
         browser.storage.sync.set({ webclient: false }).then(data => {
@@ -174,13 +181,14 @@ function createNotificationHandler() {
         zoom.scheduleData.forEach((schedule, s) => {
           schedule.days.forEach((day, d) => {
             if (zoom.notification && day) {
-              if (store.state.reminder != [] && store.state.reminder != undefined);
-              store.state.reminder.forEach((item, i) => {
-                browser.alarms.create(
-                  JSON.stringify({ data: zoom, timeDelay: item }), // optional string with more data
-                  { when: findClosestFutureTime(d, schedule.time, item), periodInMinutes: 10080 } // optional object
-                );
-              });
+              if (store.state.reminder != [] && store.state.reminder != undefined) {
+                store.state.reminder.forEach((item, i) => {
+                  browser.alarms.create(
+                    JSON.stringify({ data: zoom, timeDelay: item }), // optional string with more data
+                    { when: findClosestFutureTime(d, schedule.time, item), periodInMinutes: 10080 } // optional object
+                  );
+                });
+              }
               browser.alarms.create(
                 JSON.stringify({ data: zoom, timeDelay: 0 }), // optional string with more data
                 { when: findClosestFutureTime(d, schedule.time, 0), periodInMinutes: 10080 } // optional object
@@ -214,6 +222,7 @@ function findClosestFutureTime(dayIndex, time, delay) {
 // )
 //
 browser.alarms.onAlarm.addListener(alarm => {
+  console.log(alarm);
   // clear All active current notifications so user doesn't have too many
   browser.notifications.getAll().then(notifications => {
     notifications = Object.keys(notifications);
@@ -240,7 +249,7 @@ browser.alarms.onAlarm.addListener(alarm => {
           });
         });
     } else {
-      if (store.state.autoJoin) {
+      if (alarmData.data.autoJoin) {
         browser.notifications
           .create('', {
             iconUrl: 'icons/icon_128.png',
