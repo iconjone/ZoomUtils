@@ -329,11 +329,12 @@
               no-data-text="No Reminders"
               v-model="reminder"
               :items="reminderItems"
-              label="Reminder Intervals in Minutes. Type for custom intervals. (Empty for no Reminders)"
+              label="Meeting Reminder in Minutes with Notifications. Type for custom intervals."
               multiple
               :clearable="true"
               chips
               hide-selected
+              :rules = "reminderRules"
             ></v-combobox>
             <!-- <v-switch v-model="autoJoin" label="Auto Join Zoom Meetings"></v-switch> -->
 
@@ -567,7 +568,8 @@ export default {
       daysLetter: ['S', 'M', 'T', 'W', 'Th', 'F', 'S'],
       timeDialog: false,
       time: null,
-      reminderItems: [5, 10, 15, 30, 45, 60],
+      reminderItems: [5, 10, 15, 30, 60],
+      reminderRules: [function(arr){if(arr.length <=0)return true; arr.forEach((val, i) =>{  if(val <= 0){ arr[i] = arr[i] * -1  }   });}]
     };
   },
   components: {
