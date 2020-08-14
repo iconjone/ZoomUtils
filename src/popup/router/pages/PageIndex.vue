@@ -162,7 +162,7 @@
                       <template v-slot:activator="{ on, attrs }">
                         <v-btn
                           target="blank"
-                          :href="generateZoomLink(element)"
+                          :href="generateLink(element)"
                           class="mx-4"
                           style="width:100%; "
                           color="primary"
@@ -330,8 +330,11 @@
               multiple
               :clearable="true"
               chips
+              hide-selected
             ></v-combobox>
-            <v-switch v-model="autoJoin" label="Auto Join Zoom Meetings"></v-switch>
+            <!-- <v-switch v-model="autoJoin" label="Auto Join Zoom Meetings"></v-switch> -->
+
+            <v-switch v-model="webClient" label="Join by web-client for Zoom Meetings"></v-switch>
           </v-container>
 
           <v-divider></v-divider>
@@ -341,7 +344,7 @@
               text
               @click="
                 reminder = [15];
-                autoJoin = false;
+                webClient = false;
               "
               color="error"
             >
@@ -569,13 +572,20 @@ export default {
   },
 
   methods: {
-    ...mapActions(['setZoomData'], ['setDarkMode'], ['setScheduleData'], ['setReminder'], ['setAutoJoin']),
-    generateZoomLink(zoomData) {
+    ...mapActions(['setZoomData'], ['setDarkMode'], ['setScheduleData'], ['setReminder'], ['setAutoJoin'], ['setWebClient']),
+    generateLink(zoomData) {
       /// / TODO: make this neater and smarter
-      if (zoomData.password != '' && zoomData.password != undefined) {
-        return 'zoommtg://jonathan.zoom.us/join?action=join&confno=' + zoomData.meetingID + '&pwd=' + zoomData.password;
+      if (this.webClient) {
+        if (zoomData.password != '' && zoomData.password != undefined) {
+          return 'https://zoom.us/wc/' + zoomData.meetingID + '/join' + '?pwd=' + zoomData.password;
+        }
+        return 'https://zoom.us/wc/' + zoomData.meetingID + '/join';
+      } else {
+        if (zoomData.password != '' && zoomData.password != undefined) {
+          return 'zoommtg://jonathan.zoom.us/join?action=join&confno=' + zoomData.meetingID + '&pwd=' + zoomData.password;
+        }
+        return 'zoommtg://jonathan.zoom.us/join?action=join&confno=' + zoomData.meetingID;
       }
-      return 'zoommtg://jonathan.zoom.us/join?action=join&confno=' + zoomData.meetingID;
     },
     customAlert(msg) {
       this.alertText = msg;
@@ -814,7 +824,7 @@ export default {
         send.meetingID = '*****';
         send.password = '*****';
         send.key = '*****';
-        _gaq.push(['_trackEvent', 'meetingLaunch', JSON.stringify(data)]);
+        _gaq.push(['_trackEvent', 'meetingLaunch', JSON.stringify(send)]);
       } catch (e) {}
     },
     getLinks() {
@@ -947,6 +957,14 @@ export default {
       },
       set(value) {
         this.$store.dispatch('setAutoJoin', value);
+      },
+    },
+    webClient: {
+      get() {
+        return this.$store.state.webclient;
+      },
+      set(value) {
+        this.$store.dispatch('setWebClient', value);
       },
     },
     scheduleData() {

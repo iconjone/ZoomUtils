@@ -65,6 +65,9 @@ browser.runtime.onInstalled.addListener(function(details) {
     browser.storage.sync.set({ reminder: ['15'], autoJoin: false }).then(data => {
       console.log('set reminder and auto join');
     });
+    browser.storage.sync.set({ webclient: false }).then(data => {
+      console.log('set webclient');
+    });
 
     initStore();
   } else if (details.reason === 'update') {
@@ -89,6 +92,10 @@ browser.runtime.onInstalled.addListener(function(details) {
         browser.storage.sync.set({ autoJoin: false }).then(data => {
           console.log('set reminder and auto join');
         });
+      if (data.webclient == undefined)
+        browser.storage.sync.set({ webclient: false }).then(data => {
+          console.log('set webclient');
+        });
       initStore();
     });
   }
@@ -105,6 +112,7 @@ function initStore() {
       store.dispatch('initDarkMode', data.darkmode);
       store.dispatch('initReminder', data.reminder);
       store.dispatch('initAutoJoin', data.autoJoin);
+      store.dispatch('initWebClient', data.webclient);
       createNotificationHandler();
     } catch (e) {
       console.log('Some update error. Please reinstall.');
@@ -228,8 +236,7 @@ browser.alarms.onAlarm.addListener(alarm => {
         })
         .then(notification => {
           browser.notifications.onClicked.addListener(notification => {
-            var zoomLink = generateZoomLink(alarmData.data);
-            window.open(zoomLink, 'extension_popup');
+            openLink(alarmData.data);
           });
         });
     } else {
@@ -261,8 +268,7 @@ browser.alarms.onAlarm.addListener(alarm => {
               timer.stop();
               if (index == 1) {
                 browser.notifications.clear(id);
-                var zoomLink = generateZoomLink(alarmData.data);
-                window.open(zoomLink, 'extension_popup');
+                openLink(alarmData.data);
               }
               // browser.notifications.clear(id);
               // console.log("You chose: " + buttons[index].title);
@@ -270,8 +276,7 @@ browser.alarms.onAlarm.addListener(alarm => {
 
             timer.on('done', () => {
               if (!preventLaunch) {
-                var zoomLink = generateZoomLink(alarmData.data);
-                window.open(zoomLink, 'extension_popup');
+                openLink(alarmData.data);
                 browser.notifications.clear(notification);
               }
             });
@@ -286,8 +291,7 @@ browser.alarms.onAlarm.addListener(alarm => {
           })
           .then(notification => {
             browser.notifications.onClicked.addListener(notification => {
-              var zoomLink = generateZoomLink(alarmData.data);
-              window.open(zoomLink, 'extension_popup');
+              openLink(alarmData.data);
             });
           });
       }
@@ -295,12 +299,19 @@ browser.alarms.onAlarm.addListener(alarm => {
   }
 });
 
-function generateZoomLink(zoomData) {
+function generateLink(zoomData) {
   /// / TODO: make this neater and smarter
-  if (zoomData.password != '' && zoomData.password != undefined) {
-    return 'zoommtg://jonathan.zoom.us/join?action=join&confno=' + zoomData.meetingID + '&pwd=' + zoomData.password;
+  if (store.state.webclient) {
+    if (zoomData.password != '' && zoomData.password != undefined) {
+      return 'https://zoom.us/wc/' + zoomData.meetingID + '/join' + '?pwd=' + zoomData.password;
+    }
+    return 'https://zoom.us/wc/' + zoomData.meetingID + '/join';
+  } else {
+    if (zoomData.password != '' && zoomData.password != undefined) {
+      return 'zoommtg://jonathan.zoom.us/join?action=join&confno=' + zoomData.meetingID + '&pwd=' + zoomData.password;
+    }
+    return 'zoommtg://jonathan.zoom.us/join?action=join&confno=' + zoomData.meetingID;
   }
-  return 'zoommtg://jonathan.zoom.us/join?action=join&confno=' + zoomData.meetingID;
 }
 
 browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -308,6 +319,11 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
     createNotificationHandler();
   }
 });
+
+function openLink(data) {
+  var zoomLink = generateLink(data);
+  window.open(zoomLink, 'extension_popup');
+}
 
 // Standard Google Universal Analytics code
 

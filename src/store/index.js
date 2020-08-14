@@ -17,6 +17,7 @@ export default new Vuex.Store({
     scheduleData: [],
     reminder: [],
     autoJoin: false,
+    webclient: false,
   },
   getters,
   mutations,

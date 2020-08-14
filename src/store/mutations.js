@@ -19,4 +19,7 @@ export default {
   [types.UPDATE_AUTO_JOIN](state, payload) {
     state.autoJoin = payload;
   },
+  [types.UPDATE_WEB_CLIENT](state, payload) {
+    state.webclient = payload;
+  },
 };

@@ -39,3 +39,10 @@ export const setAutoJoin = ({ commit }, payload) => {
   commit(types.UPDATE_AUTO_JOIN, payload);
   browser.storage.sync.set({ autoJoin: payload });
 };
+export const initWebClient = ({ commit }, payload) => {
+  commit(types.UPDATE_WEB_CLIENT, payload);
+};
+export const setWebClient = ({ commit }, payload) => {
+  commit(types.UPDATE_WEB_CLIENT, payload);
+  browser.storage.sync.set({ webclient: payload });
+};

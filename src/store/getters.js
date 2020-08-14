@@ -4,3 +4,4 @@ export const darkmode = state => state.darkmode;
 export const scheduleData = state => state.scheduleData;
 export const reminder = state => state.reminder;
 export const autoJoin = state => state.autoJoin;
+export const webclient = state => state.webclient;
