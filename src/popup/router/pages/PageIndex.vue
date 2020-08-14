@@ -751,7 +751,7 @@ export default {
       var mer = 'AM';
       var timeSplit = time.split(':');
 
-      if (timeSplit[0] > 12) {
+      if (timeSplit[0] >= 12) {
         mer = 'PM';
         timeSplit[0] -= 12;
       }
