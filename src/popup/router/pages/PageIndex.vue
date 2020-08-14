@@ -282,6 +282,14 @@
             </v-list-item>
             <v-list-item>
               <v-list-item-content>
+                <v-list-item-title>Joining Meetings:</v-list-item-title>
+                <div class="body-2">
+                  Click on the blue Meeting Id to easily join your meeting.
+                </div>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-content>
                 <v-list-item-title>Setting Notifications:</v-list-item-title>
                 <div class="body-2">
                   To add meeting times, expand the meeting options by clicking on the meeting row. Select the <v-icon color="secondary" small>mdi-calendar</v-icon> icon to open the
@@ -290,8 +298,10 @@
                   <v-icon color="secondary" small>mdi-close</v-icon> icon.<br />
                   To set notifications on for a class, expand the meeting options, and switch the Notifications Switch to the on position.
                   <br />
-                  To set Auto Join on (Which will automatically open Zoom Meetings at the inputted time) or adjust the reminders interval, open the menu and select the
-                  <v-icon color="secondary" small>mdi-cog</v-icon> icon and adjust the parameters in the dialog that pops up.
+                  To set Auto Join on (Which will automatically open Zoom Meetings at the inputted time) switch the Auto-Join Switch to the on position.
+                  <br />
+                  To adjust the reminders interval, open the menu and select the <v-icon color="secondary" small>mdi-cog</v-icon> icon and adjust the parameters in the dialog that
+                  pops up.
                 </div>
               </v-list-item-content>
             </v-list-item>
@@ -301,6 +311,8 @@
             >Hints: <br />
             Pin this extension for easy access to your classes! <br />
             Click the checkbox when launching a meeting to allow this extension to always be able to open Zoom<br />
+            Open Zoom Meetings via web-client by opening settings and switching the toggles<br />
+            Set Dark or Light mode, by opening the Menu and switching the toggles.<br />
             To find your meeting ID manually navigate to your link in your browser, and observe the link generated. After 'zoom.us/j or w or s/' you should see a 9 to 11 digit id
             which is your Meeting ID!</v-card-subtitle
           >
@@ -334,7 +346,7 @@
               :clearable="true"
               chips
               hide-selected
-              :rules = "reminderRules"
+              :rules="reminderRules"
             ></v-combobox>
             <!-- <v-switch v-model="autoJoin" label="Auto Join Zoom Meetings"></v-switch> -->
 
@@ -569,7 +581,16 @@ export default {
       timeDialog: false,
       time: null,
       reminderItems: [5, 10, 15, 30, 60],
-      reminderRules: [function(arr){if(arr.length <=0)return true; arr.forEach((val, i) =>{  if(val <= 0){ arr[i] = arr[i] * -1  }   });}]
+      reminderRules: [
+        function(arr) {
+          if (arr.length <= 0) return true;
+          arr.forEach((val, i) => {
+            if (val <= 0) {
+              arr[i] = arr[i] * -1;
+            }
+          });
+        },
+      ],
     };
   },
   components: {
