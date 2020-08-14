@@ -245,9 +245,9 @@
               <v-list-item-content>
                 <v-list-item-title>Adding a meeting:</v-list-item-title>
                 <div class="body-2">
-                  To add a meeting you can navigate to any page that contains a Zoom Meeting Link and open the extension. You can then click
-                  <v-btn class="ma-2" color="secondary" small> <v-icon left>mdi-plus</v-icon> Add ZOOM Link from Page </v-btn> from the navbar and it will open a dialog to enter in
-                  a Class Name and Info. The Meeting Id (and password if applicable) will be filled out already.<br />
+                  To add a meeting you can navigate to any page that contains a Zoom Meeting Link (such as your email) and open the extension. You can then click
+                  <v-btn class="ma-2" color="secondary" small> <v-icon left>mdi-plus</v-icon> Add ZOOM Link from Page </v-btn> from the top of the extension page and it will open a
+                  dialog to enter in your Class Name and Info. The Meeting Id (and password if applicable) will be filled out automatically.<br />
                   To manually add a Zoom Meeting, open the menu, select the <v-icon color="secondary" small>mdi-plus</v-icon> icon, and fill out the dialog. To enter in a Password,
                   check the Password checkbox on the top right.
                 </div>
@@ -293,12 +293,12 @@
                 <v-list-item-title>Setting Notifications:</v-list-item-title>
                 <div class="body-2">
                   To add meeting times, expand the meeting options by clicking on the meeting row. Select the <v-icon color="secondary" small>mdi-calendar</v-icon> icon to open the
-                  meeting times dialog. Add or Edit the meeting schedule by selecting the days that the Zoom Meeting meets on as well as clicking the the
-                  <v-icon color="secondary" small>mdi-access_time</v-icon> icon to set the meeting time. To delete a meeting time, select the
+                  meeting times dialog. Add or Edit the meeting schedule by selecting the days that the Zoom Meeting meets on as well as clicking the
+                  <v-icon color="secondary" small>access_time</v-icon> icon to set the meeting time. To delete a meeting time, select the
                   <v-icon color="secondary" small>mdi-close</v-icon> icon.<br />
-                  To set notifications on for a class, expand the meeting options, and switch the Notifications Switch to the on position.
+                  To enable notifications for a class, expand the meeting options, and switch the Notifications Switch to the on position.
                   <br />
-                  To set Auto Join on (Which will automatically open Zoom Meetings at the inputted time) switch the Auto-Join Switch to the on position.
+                  To enable Auto Join (Which will automatically open Zoom Meetings at the inputted time) switch the Auto-Join Switch to the on position.
                   <br />
                   To adjust the reminders interval, open the menu and select the <v-icon color="secondary" small>mdi-cog</v-icon> icon and adjust the parameters in the dialog that
                   pops up.
@@ -311,8 +311,8 @@
             >Hints: <br />
             Pin this extension for easy access to your classes! <br />
             Click the checkbox when launching a meeting to allow this extension to always be able to open Zoom<br />
-            Open Zoom Meetings via web-client by opening settings and switching the toggles<br />
-            Set Dark or Light mode, by opening the Menu and switching the toggles.<br />
+            Open Zoom Meetings via web-client by opening settings and switching the toggle<br />
+            Set Dark or Light mode, by opening the Menu and switching the toggle.<br />
             To find your meeting ID manually navigate to your link in your browser, and observe the link generated. After 'zoom.us/j or w or s/' you should see a 9 to 11 digit id
             which is your Meeting ID!</v-card-subtitle
           >
