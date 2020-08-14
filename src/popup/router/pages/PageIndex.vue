@@ -589,6 +589,7 @@ export default {
               arr[i] = arr[i] * -1;
             }
           });
+          return true;
         },
       ],
     };
