@@ -78,7 +78,7 @@ browser.runtime.onInstalled.addListener(function(details) {
         var zoomData = JSON.parse(data.zoomData);
         zoomData.forEach((item, i) => {
           zoomData[i].key = item.meetingID + item.class + item.info; // make the key id+name+info
-          zoomData[i].notification = false;
+          if (zoomData[i].notification == undefined) zoomData[i].notification = false;
           if (zoomData[i].autoJoin == undefined) {
             if (data.autoJoin == undefined || data.autoJoin) {
               zoomData[i].autoJoin = true;
