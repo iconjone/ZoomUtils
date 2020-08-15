@@ -73,24 +73,30 @@ browser.runtime.onInstalled.addListener(function(details) {
   } else if (details.reason === 'update') {
     console.log('Updating....');
     browser.storage.sync.get().then(data => {
+      var zoomData = data.zoomData;
       if (typeof data.zoomData === 'string' || data.zoomData instanceof String) {
         // Process old data and add any needed information.
         var zoomData = JSON.parse(data.zoomData);
         zoomData.forEach((item, i) => {
           zoomData[i].key = item.meetingID + item.class + item.info; // make the key id+name+info
-          if (zoomData[i].notification == undefined) zoomData[i].notification = false;
-          if (zoomData[i].autoJoin == undefined) {
-            if (data.autoJoin == undefined || data.autoJoin) {
-              zoomData[i].autoJoin = true;
-            } else {
-              zoomData[i].autoJoin = false;
-            }
-          }
         });
-        var promise = browser.storage.sync.set({ zoomData: zoomData });
-        console.log(promise);
         console.log('Old string data has been converted to object data');
       }
+      zoomData.forEach((item, i) => {
+        if (zoomData[i].notification == undefined) zoomData[i].notification = false;
+        if (zoomData[i].autoJoin == undefined) {
+          if (data.autoJoin == undefined || !data.autoJoin) {
+            zoomData[i].autoJoin = false;
+          } else if (data.autoJoin) {
+            zoomData[i].autoJoin = false;
+            zoomData[i].notification = true;
+          }
+        }
+      });
+      browser.storage.sync.set({ zoomData: zoomData }).then(data => {
+        console.log('updated zoom Data');
+      });
+
       if (data.reminder == undefined)
         browser.storage.sync.set({ reminder: ['15'] }).then(data => {
           console.log('set reminder');
