@@ -1,7 +1,7 @@
 {
   "name": "Zoom Utils",
   "description": "Zoom Utils for Zoom University. Allows you to keep track of, notify, and launch your Zoom Classes.",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "manifest_version": 2,
   "permissions": ["activeTab", "storage", "<all_urls>", "notifications", "alarms"],
   "icons": {
