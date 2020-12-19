@@ -176,7 +176,26 @@
                     </v-tooltip>
                   </v-col>
                   <v-col class=" pl-4 center-list text-center">
-                    {{ element.info }}
+                    <v-btn text class="button-normal" @click.stop="handleEditInfo(element)">
+                      {{ element.info }}
+                    </v-btn>
+                    <v-dialog v-model="editInfoDialog">
+                      <v-card>
+                        <v-card-title>
+                          {{ editInfoTitle }}
+                        </v-card-title>
+                        <v-container fluid>
+                          <v-text-field label="Edit Info" v-model="editInfoText"></v-text-field>
+                        </v-container>
+
+                        <v-divider></v-divider>
+
+                        <v-card-actions>
+                          <v-spacer></v-spacer>
+                          <v-btn text color="success" @click="handleEditInfoSave()"> Save </v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </v-dialog>
                   </v-col>
                 </v-row>
               </v-expansion-panel-header>
@@ -224,8 +243,9 @@
       <span class="">&copy; {{ new Date().getFullYear() }} Amacel Web Development</span>
     </v-footer>
     <div class="text-center">
-      <v-dialog v-model="infoDialog" width="500">
-        <v-card>
+      <!-- <InfoDialogCard :dialog.sync="infoDialog" width="500"></InfoDialogCard> -->
+      <v-dialog v-model="infoDialog" width="500"
+        ><v-card>
           <v-card-title>
             Information
           </v-card-title>
@@ -548,6 +568,7 @@
 
 <script>
 import draggable from 'vuedraggable';
+// import InfoDialogCard from './InfoDialogCard'; //add to components object in export
 
 import { mapActions } from 'vuex';
 global.browser = require('webextension-polyfill');
@@ -559,6 +580,9 @@ export default {
       drag: false,
       infoDialog: false,
       addDialog: false,
+      editInfoDialog: false,
+      editInfoTitle: 'Edit Info',
+      editInfoText: 'Edit Info',
       scheduleDialog: false,
       settingsDialog: false,
       supportDialog: false,
@@ -691,6 +715,26 @@ export default {
       } else {
         this.customAlert('Something went wrong. Check the Meeting ID');
       }
+    },
+    handleEditInfo(element) {
+      console.log(element);
+      this.editKey = element.key;
+      this.editInfoTitle = 'Edit ' + element.class + ' Info';
+      this.editInfoText = element.info;
+      this.editInfoDialog = true;
+    },
+    handleEditInfoSave() {
+      var vueApp = this;
+      var currentData = this.zoomData;
+
+      currentData.forEach(data => {
+        if (vueApp.editKey == data.key) {
+          data.info = vueApp.editInfoText;
+          data.key = data.meetingID + data.class + vueApp.editInfoText;
+        }
+      });
+      this.zoomData = currentData;
+      this.editInfoDialog = false;
     },
     handleCopyClipBoardClick(element) {
       var link = 'https://zoom.us/j/' + element.meetingID;
@@ -849,7 +893,7 @@ export default {
       });
     },
     meetingLaunched(data) {
-      var send = JSON.parse(JSON.stringify(data));
+      var send = JSON.parse(JSON.stringify(data)); //what am I doing here....
       try {
         // remove private info like meetingId and password
         send.meetingID = '*****';
@@ -1076,6 +1120,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.button-normal {
+  font-weight: normal !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
 p {
   font-size: 20px;
 }

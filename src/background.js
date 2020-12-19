@@ -44,7 +44,7 @@ browser.runtime.onInstalled.addListener(function(details) {
       .set({
         zoomData: [
           { class: 'ESET 210', meetingID: '123456789', info: 'Click on the info Icon!', key: 1, notification: false, autoJoin: false },
-          { class: 'CSCE 222', meetingID: '123456789', info: 'Meet with Professor', key: 2, notification: false, autoJoin: false },
+          { class: 'CSCE 222', meetingID: '123456789', info: 'Click on this info to edit', key: 2, notification: false, autoJoin: false },
           { class: 'PHYS 207', meetingID: '123456789', info: 'Homework due', key: 3, notification: false, autoJoin: false },
         ],
       })
