@@ -914,6 +914,27 @@ export default {
     },
     parseLinks(link) {
       // https://stackoverflow.com/questions/11684454/getting-the-source-html-of-the-current-page-from-chrome-extension
+      //if tab is gmail, find ICS file and parse it
+      browser.tabs.query({ active: true, lastFocusedWindow: true }).then(tabs => {
+        console.log(tabs);
+        let url = tabs[0].url;
+        console.log(url);
+        if (url.includes('mail.google.com')) {
+          //get all elements with the download_url
+          browser.tabs
+            .executeScript(null, {
+              code:
+                'Array.from(document.querySelectorAll("div[download_url]")).map(divs => fetch(divs.getAttribute("download_url")).then(response=>{response.text().then(text=>return text)}))',
+            })
+            .then(results => {
+              results = results[0];
+              console.log(results);
+            });
+        }
+
+        // use `url` here inside the callback because it's asynchronous!
+      });
+
       browser.tabs
         .executeScript(null, { code: 'Array.from(document.links).map(links => links.href)' })
         .then(results => {
